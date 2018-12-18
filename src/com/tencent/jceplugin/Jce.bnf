@@ -1,0 +1,20 @@
+{
+  parserClass="com.tencent.jceplugin.parser.JceParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Jce"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.tencent.jceplugin.psi"
+  psiImplPackage="com.tencent.jceplugin.psi.impl"
+
+  elementTypeHolderClass="com.tencent.jceplugin.psi.JceTypes"
+  elementTypeClass="com.tencent.jceplugin.psi.JceElementType"
+  tokenTypeClass="com.tencent.jceplugin.psi.JceTokenType"
+}
+
+jceFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
