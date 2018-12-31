@@ -41,14 +41,14 @@
     MAP                    = 'map'
     MODULE              = 'module'
     INTERFACE              = 'interface'
-    IDENTIFIER             = 'identifier'
+    IDENTIFIER             = 'regexp:[[:alpha:]_][[:alnum:]_]*'
     OUT                    = 'out'
     KEY                    = 'key'
     ROUTE_KEY              = 'routekey'
     REQUIRE                = 'require'
     OPTIONAL               = 'optional'
-//    INTEGER_LITERAL        = integer_constant
-//    FLOATING_POINT_LITERAL = floating_literal
+    INTEGER_LITERAL        = 'regexp:(\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))'
+    FLOATING_POINT_LITERAL = 'regexp:(((\+|-)?(([[:digit:]]*\.[[:digit:]]+)|([[:digit:]]+\.))(e|E)(\+|-)?[[:digit:]]+?)|((\+|-)?[[:digit:]]+(e|E)(\+|-)?[[:digit:]]+))[fF]?'
     FALSE                  = 'false'
     TRUE                   = 'true'
     STRING_LITERAL         = '\".*\"'
@@ -56,6 +56,7 @@
     CONST                 =  'const'
     ENUM                   = 'enum'
     UNSIGNED              =  'unsigned'
+    LINE_COMMENT           = '// [^\r\n]*'
   ]
 
 }
