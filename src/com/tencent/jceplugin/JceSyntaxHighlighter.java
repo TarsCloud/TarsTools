@@ -40,18 +40,18 @@ public class JceSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (tokenType.equals(JceTypes.SEPARATOR)) {
-            return SEPARATOR_KEYS;
-        } else if (tokenType.equals(JceTypes.KEY)) {
-            return KEY_KEYS;
-        } else if (tokenType.equals(JceTypes.VALUE)) {
-            return VALUE_KEYS;
-        } else if (tokenType.equals(JceTypes.COMMENT)) {
-            return COMMENT_KEYS;
-        } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
-            return BAD_CHAR_KEYS;
-        } else {
-            return EMPTY_KEYS;
-        }
+//        if (tokenType.equals(JceTypes.SEPARATOR)) {
+//            return SEPARATOR_KEYS;
+//        } else if (tokenType.equals(JceTypes.KEY)) {
+//            return KEY_KEYS;
+//        } else if (tokenType.equals(JceTypes.VALUE)) {
+//            return VALUE_KEYS;
+//        } else if (tokenType.equals(JceTypes.COMMENT)) {
+//            return COMMENT_KEYS;
+//        } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
+//            return BAD_CHAR_KEYS;
+//        } else {
+//            return EMPTY_KEYS;
+//        }
     }
 }

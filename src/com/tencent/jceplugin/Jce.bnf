@@ -11,10 +11,107 @@
   elementTypeHolderClass="com.tencent.jceplugin.psi.JceTypes"
   elementTypeClass="com.tencent.jceplugin.psi.JceElementType"
   tokenTypeClass="com.tencent.jceplugin.psi.JceTokenType"
+
+//  identifier      =     [[:alpha:]_][[:alnum:]_]*
+//  integer_constant =    (\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))
+//  fractional_constant=    (\+|-)?(([[:digit:]]*\.[[:digit:]]+)|([[:digit:]]+\.))
+//  exponent_part    =    (e|E)(\+|-)?[[:digit:]]+
+//  floating_literal =     (({fractional_constant}{exponent_part}?)|((\+|-)?[[:digit:]]+{exponent_part}))[fF]?
+
+  tokens=[
+      LBRACE               =  '{'
+      RBRACE               =  '}'
+      LBRACK               =  '['
+      RBRACK               =  ']'
+      LPAREN               =  '('
+      RPAREN               =  ')'
+          SEMICOLON            =  ';'
+          COMMA                =  ','
+    VOID                   = 'void'
+    STRUCT                 = 'struct'
+    BOOL                   = 'bool'
+    BYTE                   = 'byte'
+    SHORT                  = 'short'
+    INT                    = 'int'
+    DOUBLE                 = 'double'
+    FLOAT                  = 'float'
+    LONG                   = 'long'
+    STRING                 = 'string'
+    VECTOR                 = 'vector'
+    MAP                    = 'map'
+    MODULE              = 'module'
+    INTERFACE              = 'interface'
+    IDENTIFIER             = 'identifier'
+    OUT                    = 'out'
+    KEY                    = 'key'
+    ROUTE_KEY              = 'routekey'
+    REQUIRE                = 'require'
+    OPTIONAL               = 'optional'
+//    INTEGER_LITERAL        = integer_constant
+//    FLOATING_POINT_LITERAL = floating_literal
+    FALSE                  = 'false'
+    TRUE                   = 'true'
+    STRING_LITERAL         = '\".*\"'
+    SCOPE_DELIMITER        = '::'
+    CONST                 =  'const'
+    ENUM                   = 'enum'
+    UNSIGNED              =  'unsigned'
+  ]
+
 }
 
-jceFile ::= item_*
-
-private item_ ::= (property|COMMENT|CRLF)
-
-property ::= (KEY? SEPARATOR VALUE?) | KEY
+start ::= namespaces
+namespaces ::= namespace ';' namespaces
+              |namespace
+namespace ::= TOKEN_MODULE TOKEN_IDENTIFIER '{' defintions '}'
+definitions ::= definition ';' definitions
+definition  ::= interface_def
+               | struct_def
+               | key_def
+               | enum_def
+               | const_def
+enum_def ::= TOKEN_ENUM TOKEN_IDENTIFIER'{' enumerator_list '}'
+enumerator_list ::= enumerator ',' enumerator_list
+                   | enumerator
+enumerator ::= TOKEN_IDENTIFIER
+              | TOKEN_IDENTIFIER  '=' const_initializer
+key_def ::=  TOKEN_KEY '[' scoped_name ','key_members ']'
+key_members ::=  TOKEN_IDENTIFIER
+                | key_members ',' TOKEN_IDENTIFIER
+interface_def ::= TOKEN_INTERFACE TOKEN_IDENTIFIER '{' interface_exports '}'
+interface_exports ::=  interface_export ';' interface_exports
+                      | interface_export
+interface_export ::= type TOKEN_IDENTIFIER '(' parameters ')'
+parameters ::= parameter ',' parameters
+              | parameter
+parameter ::=  // empty
+             | type_id
+             | TOKEN_OUT type_id
+             | TOKEN_ROUTE_KEY type_id
+struct_def ::= TOKEN_STRUCT TOKEN_IDENTIFIER '{' struct_exports '}'
+struct_exports ::= data_member ';' struct_exports
+                  | data_member
+data_member ::=  TOKEN_INTEGER_LITERAL TOKEN_REQUIRE type_id
+                | TOKEN_INTEGER_LITERAL TOKEN_REQUIRE type_id '=' const_initializer
+                | TOKEN_INTEGER_LITERAL TOKEN_OPTIONAL type_id '=' const_initializer
+                | TOKEN_INTEGER_LITERAL TOKEN_OPTIONAL type_id
+const_initializer ::= TOKEN_INTEGER_LITERAL
+                    | TOKEN_FLOATING_POINT_LITERAL
+                    | TOKEN_STRING_LITERAL
+                    | TOKEN_FALSE
+                    | TOKEN_TRUE
+                    | TOKEN_IDENTIFIER
+                    | scoped_name TOKEN_SCOPE_DELIMITER TOKEN_IDENTIFIER
+const_def ::= TOKEN_CONST type_id '=' const_initializer
+type_id ::= type TOKEN_IDENTIFIER
+type ::= TOKEN_BOOL
+        | TOKEN_BYTE
+        | TOKEN_UNSIGNED TOKEN_BYTE
+        | TOKEN_SHORT
+        | TOKEN_UNSIGNED TOKEN_SHORT
+        | TOKEN_INT
+        | TOKEN_UNSIGNED TOKEN_INT
+        | TOKEN_LONG
+        | TOKEN_FLOAT
+        | TOKEN_DOUBLE
+        | TOKEN_STRING
