@@ -2,43 +2,118 @@ package com.tencent.jceplugin;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import com.tencent.jceplugin.psi.JceTypes;
 import com.intellij.psi.TokenType;
+
+import com.tencent.jceplugin.psi.JceTypes;
+
+import static com.intellij.psi.TokenType.BAD_CHARACTER;
+import static com.tencent.jceplugin.JceParserDefinition.*;
 
 %%
 
 %class JceLexer
-%implements FlexLexer
+%implements FlexLexer, JceTypes
 %unicode
+%public
+
 %function advance
 %type IElementType
+
 %eof{  return;
 %eof}
 
-CRLF=\R
-WHITE_SPACE=[\ \n\t\f]
-FIRST_VALUE_CHARACTER=[^ \n\f\\] | "\\"{CRLF} | "\\".
-VALUE_CHARACTER=[^\n\f\\] | "\\"{CRLF} | "\\".
-END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
-SEPARATOR=[:=]
-KEY_CHARACTER=[^:=\ \n\t\f\\] | "\\ "
+NL = \R
+WS = [ \t\f]
 
-%state WAITING_VALUE
+LINE_COMMENT = "//" [^\r\n]*
+MULTILINE_COMMENT = "/*" ( ([^"*"]|[\r\n])* ("*"+ [^"*""/"] )? )* ("*" | "*"+"/")?
+
+LETTER = [:letter:] | "_"
+DIGIT =  [:digit:]
+
+HEX_DIGIT = [0-9A-Fa-f]
+INT_DIGIT = [0-9]
+OCT_DIGIT = [0-7]
+
+NUM_INT = "0" | ([1-9] {INT_DIGIT}*)
+NUM_HEX = ("0x" | "0X") {HEX_DIGIT}+
+NUM_OCT = "0" {OCT_DIGIT}+
+
+FLOAT_EXPONENT = [eE] [+-]? {DIGIT}+
+NUM_FLOAT = ( ( ({DIGIT}+ "." {DIGIT}*) | ({DIGIT}* "." {DIGIT}+) ) {FLOAT_EXPONENT}?) | ({DIGIT}+ {FLOAT_EXPONENT})
+
+IDENT = {LETTER} ({LETTER} | {DIGIT} )*
+
+STR =      "\""
+STRING = {STR} ( [^\"\\\n\r] | "\\" ("\\" | {STR} | {ESCAPES} | [0-8xuU] ) )* {STR}?
+ESCAPES = [abfnrtv]
+
+%state MAYBE_SEMICOLON
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(YYINITIAL); return JceTypes.COMMENT; }
+<YYINITIAL> {
+{WS}                                      { return WS; }
+{NL}+                                     { return NLS; }
 
-<YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return JceTypes.KEY; }
+{LINE_COMMENT}                            { return LINE_COMMENT; }
+{MULTILINE_COMMENT}                       { return MULTILINE_COMMENT; }
 
-<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return JceTypes.SEPARATOR; }
+{STRING}                                  { yybegin(MAYBE_SEMICOLON); return STRING; }
 
-<WAITING_VALUE> {CRLF}({CRLF}|{WHITE_SPACE})+               { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+"{"                                       { return LBRACE; }
+"}"                                       { yybegin(MAYBE_SEMICOLON); return RBRACE; }
+"["                                       { return LBRACK; }
+"]"                                       { yybegin(MAYBE_SEMICOLON); return RBRACK; }
+"("                                       { return LPAREN; }
+")"                                       { yybegin(MAYBE_SEMICOLON); return RPAREN; }
+";"                                       { return SEMICOLON; }
+","                                       { return COMMA; }
+"="                                       { return ASSIGN; }
 
-<WAITING_VALUE> {WHITE_SPACE}+                              { yybegin(WAITING_VALUE); return TokenType.WHITE_SPACE; }
+"void"                                    { return VOID; }
+"struct"                                  { return STRUCT; }
+"bool"                                    { return BOOL; }
+"byte"                                    { return BYTE; }
+"short"                                   { return SHORT; }
+"int"                                     { return INT; }
+"double"                                  { return DOUBLE; }
+"float"                                   { return FLOAT; }
+"long"                                    { return LONG; }
+"string"                                  { return STRING; }
+"vector"                                  { return VECTOR; }
+"map"                                     { return MAP; }
+"key"                                     { return KEY; }
+"routekey"                                { return ROUTE_KEY; }
+"module"                                  { return MODULE; }
+"interface"                               { return INTERFACE; }
+"out"                                     { return OUT; }
+"require"                                 { return REQUIRE; }
+"optional"                                { return OPTIONAL; }
+"false"                                   { return FALSE; }
+"true"                                    { return TRUE; }
+"enum"                                    { return ENUM; }
+"const"                                   { return CONST; }
 
-<WAITING_VALUE> {FIRST_VALUE_CHARACTER}{VALUE_CHARACTER}*   { yybegin(YYINITIAL); return JceTypes.VALUE; }
+"unsigned"                                { return UNSIGNED; }
+"::"                                      { return SCOPE_DELIMITER; }
 
-({CRLF}|{WHITE_SPACE})+                                     { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+{IDENT}                                   { yybegin(MAYBE_SEMICOLON); return IDENTIFIER; }
+{NUM_INT}                                 { yybegin(MAYBE_SEMICOLON); return INT; }
+{NUM_FLOAT}                               { yybegin(MAYBE_SEMICOLON); return FLOAT; }
 
-[^]                                                         { return TokenType.BAD_CHARACTER; }
+//{NUM_FLOAT}"i"                            { yybegin(MAYBE_SEMICOLON); return FLOATI; }
+//{DIGIT}+"i"                               { yybegin(MAYBE_SEMICOLON); return DECIMALI; }
+//{NUM_OCT}                                 { yybegin(MAYBE_SEMICOLON); return OCT; }
+//{NUM_HEX}                                 { yybegin(MAYBE_SEMICOLON); return HEX; }
+
+.                                         { return BAD_CHARACTER; }
+}
+
+<MAYBE_SEMICOLON> {
+{WS}                                      { return WS; }
+{NL}                                      { yybegin(YYINITIAL); yypushback(yytext().length()); return SEMICOLON_SYNTHETIC; }
+{LINE_COMMENT}                            { return LINE_COMMENT; }
+{MULTILINE_COMMENT}                       { return MULTILINE_COMMENT; }
+.                                         { yybegin(YYINITIAL); yypushback(yytext().length()); }
+}

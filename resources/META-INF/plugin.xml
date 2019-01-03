@@ -1,34 +1,38 @@
 <idea-plugin>
   <id>com.tencent.jceplugin</id>
   <name>JCE Support</name>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <vendor email="harveyxu@tencent.com" url="http://www.tencent.com">Tencent</vendor>
 
   <description><![CDATA[
-      支持Jce的编辑工作.<br>
-      <em>如有问题，请内部联系</em>
+      This plugin supports the editing of the Jce file, providing the following features:
+      <li>
+            <ol>Syntax highlighting</ol>
+            <ol>Code completion</ol>
+            <ol>Format Code</ol>
+            <ol>......</ol>
+      <li>
+      If any question, contract with harveyxu @ wechat work.
     ]]></description>
 
   <change-notes><![CDATA[
-      v0.1.0 2018/12/20<br>
-      <em>简单语法高亮</em>
+      v0.1.0 2019/01/03
+      <li>
+            <ol>Syntax highlighting</ol>
+            <ol>Other features coming</ol>
+      </li>
     ]]>
   </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
   <idea-version since-build="173.0"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
   <depends>com.intellij.modules.lang</depends>
-  -->
 
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.tencent.jceplugin.JceFileTypeFactory"/>
       <lang.parserDefinition language="Jce" implementationClass="com.tencent.jceplugin.JceParserDefinition"/>
-      <lang.syntaxHighlighterFactory language="Jce" implementationClass="com.tencent.jceplugin.JceSyntaxHighlighterFactory"/>
-      <colorSettingsPage implementation="com.tencent.jceplugin.JceColorSettingsPage"/>
+      <lang.syntaxHighlighterFactory language="Jce" implementationClass="com.tencent.jceplugin.highlighting.JceSyntaxHighlighterFactory"/>
+      <colorSettingsPage implementation="com.tencent.jceplugin.highlighting.JceColorSettingsPage"/>
   </extensions>
 
   <actions>
