@@ -19,44 +19,52 @@
 //  floating_literal =     (({fractional_constant}{exponent_part}?)|((\+|-)?[[:digit:]]+{exponent_part}))[fF]?
 
   tokens=[
-      LBRACE               =  '{'
-      RBRACE               =  '}'
-      LBRACK               =  '['
-      RBRACK               =  ']'
-      LPAREN               =  '('
-      RPAREN               =  ')'
-          SEMICOLON            =  ';'
-          COMMA                =  ','
+    LBRACE               =  '{'
+    RBRACE               =  '}'
+    LBRACK               =  '['
+    RBRACK               =  ']'
+    LPAREN               =  '('
+    RPAREN               =  ')'
+    SEMICOLON            =  ';'
+    COMMA                =  ','
+    ASSIGN               =  '='
+//
     VOID                   = 'void'
-    STRUCT                 = 'struct'
-    BOOL                   = 'bool'
-    BYTE                   = 'byte'
-    SHORT                  = 'short'
-    INT                    = 'int'
-    DOUBLE                 = 'double'
-    FLOAT                  = 'float'
-    LONG                   = 'long'
-    STRING                 = 'string'
-    VECTOR                 = 'vector'
-    MAP                    = 'map'
-    MODULE              = 'module'
-    INTERFACE              = 'interface'
-    IDENTIFIER             = 'regexp:[[:alpha:]_][[:alnum:]_]*'
-    OUT                    = 'out'
-    KEY                    = 'key'
-    ROUTE_KEY              = 'routekey'
-    REQUIRE                = 'require'
-    OPTIONAL               = 'optional'
-    INTEGER_LITERAL        = 'regexp:(\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))'
-    FLOATING_POINT_LITERAL = 'regexp:(((\+|-)?(([[:digit:]]*\.[[:digit:]]+)|([[:digit:]]+\.))(e|E)(\+|-)?[[:digit:]]+?)|((\+|-)?[[:digit:]]+(e|E)(\+|-)?[[:digit:]]+))[fF]?'
-    FALSE                  = 'false'
-    TRUE                   = 'true'
-    STRING_LITERAL         = '\".*\"'
-    SCOPE_DELIMITER        = '::'
-    CONST                 =  'const'
-    ENUM                   = 'enum'
-    UNSIGNED              =  'unsigned'
-    LINE_COMMENT           = '// [^\r\n]*'
+//    STRUCT                 = 'struct'
+//    BOOL                   = 'bool'
+//    BYTE                   = 'byte'
+//    SHORT                  = 'short'
+//    INT                    = 'int'
+//    DOUBLE                 = 'double'
+//    FLOAT                  = 'float'
+//    LONG                   = 'long'
+//    STRING                 = 'string'
+//    VECTOR                 = 'vector'
+//    MAP                    = 'map'
+//    KEY                    = 'key'
+//    ROUTE_KEY              = 'routekey'
+//    MODULE                 = 'module'
+//    INTERFACE              = 'interface'
+//    OUT                    = 'out'
+//    REQUIRE                = 'require'
+//    OPTIONAL               = 'optional'
+//    FALSE                  = 'false'
+//    TRUE                   = 'true'
+//    ENUM                   = 'enum'
+//    CONST                 =  'const'
+//
+//    UNSIGNED              =  'unsigned'
+//    SCOPE_DELIMITER        = '::'
+//    STRING_LITERAL         = '\".*\"'
+//    IDENTIFIER             = 'regexp:[[:alpha:]_][[:alnum:]_]*'
+//    INTEGER_LITERAL        = 'regexp:(\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))'
+//    FLOATING_POINT_LITERAL = 'regexp:(((\+|-)?(([[:digit:]]*\.[[:digit:]]+)|([[:digit:]]+\.))(e|E)(\+|-)?[[:digit:]]+?)|((\+|-)?[[:digit:]]+(e|E)(\+|-)?[[:digit:]]+))[fF]?'
+//    NL                   =  'regexp:\R'
+//    NLS                  =  'regexp:\R+'
+//    WS                   =  'regexp:[ \t\f]'
+//    LINE_COMMENT           = 'regexp:// [^\r\n]*'
+//    MULTILINE_COMMENT      = 'regexp: \"/\*" ( ([^\"*\"]|[\r\n])* (\"*\"+ [^\"*\"\"/\"] )? )* (\"*\" | \"*\"+\"/\")?'
+    SEMICOLON_SYNTHETIC  = '<NL>'
   ]
 
 }
@@ -64,55 +72,62 @@
 start ::= namespaces
 namespaces ::= namespace ';' namespaces
               |namespace
-namespace ::= TOKEN_MODULE TOKEN_IDENTIFIER '{' defintions '}'
+namespace ::= MODULE IDENTIFIER '{' defintions '}'
 definitions ::= definition ';' definitions
 definition  ::= interface_def
                | struct_def
                | key_def
                | enum_def
                | const_def
-enum_def ::= TOKEN_ENUM TOKEN_IDENTIFIER'{' enumerator_list '}'
+enum_def ::= ENUM IDENTIFIER'{' enumerator_list '}'
 enumerator_list ::= enumerator ',' enumerator_list
                    | enumerator
-enumerator ::= TOKEN_IDENTIFIER
-              | TOKEN_IDENTIFIER  '=' const_initializer
-key_def ::=  TOKEN_KEY '[' scoped_name ','key_members ']'
-key_members ::=  TOKEN_IDENTIFIER
-                | key_members ',' TOKEN_IDENTIFIER
-interface_def ::= TOKEN_INTERFACE TOKEN_IDENTIFIER '{' interface_exports '}'
+enumerator ::= IDENTIFIER
+              | IDENTIFIER  '=' const_initializer
+key_def ::=  KEY '[' scoped_name ','key_members ']'
+key_members ::=  IDENTIFIER
+                | key_members ',' IDENTIFIER
+interface_def ::= INTERFACE IDENTIFIER '{' interface_exports '}'
 interface_exports ::=  interface_export ';' interface_exports
                       | interface_export
-interface_export ::= type TOKEN_IDENTIFIER '(' parameters ')'
+interface_export ::= type IDENTIFIER '(' parameters ')'
 parameters ::= parameter ',' parameters
               | parameter
 parameter ::=  // empty
              | type_id
-             | TOKEN_OUT type_id
-             | TOKEN_ROUTE_KEY type_id
-struct_def ::= TOKEN_STRUCT TOKEN_IDENTIFIER '{' struct_exports '}'
+             | OUT type_id
+             | ROUTE_KEY type_id
+struct_def ::= STRUCT IDENTIFIER '{' struct_exports '}'
 struct_exports ::= data_member ';' struct_exports
                   | data_member
-data_member ::=  TOKEN_INTEGER_LITERAL TOKEN_REQUIRE type_id
-                | TOKEN_INTEGER_LITERAL TOKEN_REQUIRE type_id '=' const_initializer
-                | TOKEN_INTEGER_LITERAL TOKEN_OPTIONAL type_id '=' const_initializer
-                | TOKEN_INTEGER_LITERAL TOKEN_OPTIONAL type_id
-const_initializer ::= TOKEN_INTEGER_LITERAL
-                    | TOKEN_FLOATING_POINT_LITERAL
-                    | TOKEN_STRING_LITERAL
-                    | TOKEN_FALSE
-                    | TOKEN_TRUE
-                    | TOKEN_IDENTIFIER
-                    | scoped_name TOKEN_SCOPE_DELIMITER TOKEN_IDENTIFIER
-const_def ::= TOKEN_CONST type_id '=' const_initializer
-type_id ::= type TOKEN_IDENTIFIER
-type ::= TOKEN_BOOL
-        | TOKEN_BYTE
-        | TOKEN_UNSIGNED TOKEN_BYTE
-        | TOKEN_SHORT
-        | TOKEN_UNSIGNED TOKEN_SHORT
-        | TOKEN_INT
-        | TOKEN_UNSIGNED TOKEN_INT
-        | TOKEN_LONG
-        | TOKEN_FLOAT
-        | TOKEN_DOUBLE
-        | TOKEN_STRING
+data_member ::=  INTEGER_LITERAL REQUIRE type_id
+                | INTEGER_LITERAL REQUIRE type_id '=' const_initializer
+                | INTEGER_LITERAL OPTIONAL type_id '=' const_initializer
+                | INTEGER_LITERAL OPTIONAL type_id
+const_initializer ::= INTEGER_LITERAL
+                    | FLOATING_POINT_LITERAL
+                    | STRING_LITERAL
+                    | FALSE
+                    | TRUE
+                    | IDENTIFIER
+                    | scoped_name SCOPE_DELIMITER IDENTIFIER
+const_def ::= CONST type_id '=' const_initializer
+type_id ::= type IDENTIFIER
+type ::= BOOL
+        | BYTE
+        | UNSIGNED BYTE
+        | SHORT
+        | UNSIGNED SHORT
+        | INT
+        | UNSIGNED INT
+        | LONG
+        | FLOAT
+        | DOUBLE
+        | STRING
+        | vector_t
+        | map_t
+        | scoped_name
+vector_t ::= VECTOR '<' type '>'
+map_t ::= MAP '<' type ',' type '>'
+scoped_name ::= IDENTIFIER
+                | scoped_name SCOPE_DELIMITER IDENTIFIER
