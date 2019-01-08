@@ -33,6 +33,7 @@
       <lang.parserDefinition language="Jce" implementationClass="com.tencent.jceplugin.JceParserDefinition"/>
       <lang.syntaxHighlighterFactory language="Jce" implementationClass="com.tencent.jceplugin.highlighting.JceSyntaxHighlighterFactory"/>
       <colorSettingsPage implementation="com.tencent.jceplugin.highlighting.JceColorSettingsPage"/>
+    <lang.commenter language="Jce" implementationClass="com.tencent.jceplugin.JceCommenter"/>
   </extensions>
 
   <actions>
