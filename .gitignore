@@ -4,3 +4,5 @@ out
 .idea
 .DS_Store
 /build
+src/main/gen/*
+jflex-1.7.0-2.jar

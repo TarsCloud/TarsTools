@@ -1,9 +1,9 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider language="JAVA"
-                                        implementationClass="com.yuewen.intellij.jce.language.codeInsight.JceJavaLineMarkerProvider"/>
+                                        implementationClass="com.tencent.jceplugin.language.codeInsight.JceJavaLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="Jce"
-                                        implementationClass="com.yuewen.intellij.jce.language.codeInsight.JceLineMarkerProvider"/>
+                                        implementationClass="com.tencent.jceplugin.language.codeInsight.JceLineMarkerProvider"/>
     </extensions>
 
     <actions>
