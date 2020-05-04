@@ -1,0 +1,138 @@
+<idea-plugin>
+    <id>com.tencent.jceplugin</id>
+    <name>JCE Support</name>
+    <version>0.3.1</version>
+    <vendor email="harveyxu@tencent.com,kongyuanyuan@yuewen.com" url="http://www.tencent.com">Tencent.</vendor>
+
+    <description><![CDATA[
+      <p>This plugin supports the editing of the Jce/Tars file, providing the following features:</p>
+      <ol>
+            <li>Syntax highlighting</li>
+            <li>Code commenting</li>
+            <li>Formatting</li>
+            <li>Auto Completion</li>
+            <li>Static Analysis</li>
+            <li>......</li>
+      </ol>
+      <p>If any question, contact with harveyxu @ wechat work or <a href="mailto:kongyuanyuan@yuewen.com">kongyuanyuan@yuewen.com</a></p>
+    ]]>
+    </description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="java-plugin.xml">com.intellij.modules.java</depends>
+    <!--    <depends optional="true" config-file="java-plugin.xml">com.intellij.java</depends>-->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <fileTypeFactory implementation="com.tencent.jceplugin.language.JceFileTypeFactory"/>
+        <lang.parserDefinition language="Jce"
+                               implementationClass="com.tencent.jceplugin.language.JceParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Jce"
+                                       implementationClass="com.tencent.jceplugin.language.JceSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.tencent.jceplugin.language.JceColorSettingsPage"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceFieldTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceIncludeFileAnnotator"/>
+        <annotator language="Jce" implementationClass="com.tencent.jceplugin.language.annotator.JceKeyInfoAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceStructTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceEnumTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceFunctionAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceInterfaceAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceFieldDefaultValueAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.tencent.jceplugin.language.annotator.JceModuleAnnotator"/>
+        <completion.contributor language="Jce"
+                                implementationClass="com.tencent.jceplugin.language.completion.JceCompletionContributor"/>
+        <completion.contributor language="Jce"
+                                implementationClass="com.tencent.jceplugin.language.completion.JceCustomTypeCompletionContributor"/>
+        <psi.referenceContributor
+                implementation="com.tencent.jceplugin.language.reference.JceTypeReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.tencent.jceplugin.language.reference.JceFileReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructFieldReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.tencent.jceplugin.language.reference.JceFieldDefaultAssignmentReferenceContributor"/>
+        <lang.commenter language="Jce" implementationClass="com.tencent.jceplugin.language.JceCommenter"/>
+        <lang.findUsagesProvider language="Jce"
+                                 implementationClass="com.tencent.jceplugin.language.JceFindUsagesProvider"/>
+        <lang.elementManipulator forClass="com.tencent.jceplugin.language.psi.JceIncludeFilename"
+                                 implementationClass="com.tencent.jceplugin.language.manipulator.JceStringManipulator"/>
+        <lang.elementManipulator forClass="com.tencent.jceplugin.language.psi.JceFieldType"
+                                 implementationClass="com.tencent.jceplugin.language.manipulator.JceFieldTypeManipulator"/>
+        <lang.elementManipulator forClass="com.tencent.jceplugin.language.psi.JceRefModule"
+                                 implementationClass="com.tencent.jceplugin.language.manipulator.JceRefModuleManipulator"/>
+        <lang.elementManipulator forClass="com.tencent.jceplugin.language.psi.JceKeyInfo"
+                                 implementationClass="com.tencent.jceplugin.language.manipulator.JceKeyInfoManipulator"/>
+        <lang.refactoringSupport language="Jce"
+                                 implementationClass="com.tencent.jceplugin.language.JceRefactoringSupportProvider"/>
+        <lang.foldingBuilder language="Jce"
+                             implementationClass="com.tencent.jceplugin.language.JceFoldingBuilder"/>
+        <lang.psiStructureViewFactory language="Jce"
+                                      implementationClass="com.tencent.jceplugin.language.JceStructureViewFactory"/>
+        <lang.formatter language="Jce"
+                        implementationClass="com.tencent.jceplugin.language.formatter.JceFormattingModelBuilder"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceModuleInfo"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceModulePresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceStructType"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceStructPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceFieldInfo"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceFieldPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceEnumType"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceEnumPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceEnumMember"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceEnumMemberPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceConstType"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceConstPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceInterfaceInfo"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceInterfacePresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceFunctionInfo"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceFunctionPresentationProvider"/>
+        <itemPresentationProvider forClass="com.tencent.jceplugin.language.psi.JceFunctionParam"
+                                  implementationClass="com.tencent.jceplugin.language.presentation.JceFunctionParamPresentationProvider"/>
+        <gotoSymbolContributor implementation="com.tencent.jceplugin.language.JceChooseByNameContributor"/>
+        <include.provider implementation="com.tencent.jceplugin.language.JceIncludeProvider"/>
+        <braceMatcher filetype="Jce File" implementationClass="com.tencent.jceplugin.language.JceBraceMatcher"/>
+        <quoteHandler fileType="Jce File" className="com.tencent.jceplugin.language.JceQuoteMatcher"/>
+        <declarationRangeHandler key="com.tencent.jceplugin.language.psi.JceModuleInfo"
+                                 implementationClass="com.tencent.jceplugin.language.hint.ModuleDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.tencent.jceplugin.language.psi.JceInterfaceInfo"
+                                 implementationClass="com.tencent.jceplugin.language.hint.InterfaceDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.tencent.jceplugin.language.psi.JceStructType"
+                                 implementationClass="com.tencent.jceplugin.language.hint.StructDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.tencent.jceplugin.language.psi.JceEnumType"
+                                 implementationClass="com.tencent.jceplugin.language.hint.EnumDeclarationRangeHandler"/>
+        <lang.smartEnterProcessor language="Jce"
+                                  implementationClass="com.tencent.jceplugin.language.smartEnter.JceSmartEnterProcessor"/>
+        <breadcrumbsInfoProvider implementation="com.tencent.jceplugin.language.breadcrumbs.JceBreadcrumbsProvider"/>
+        <codeStyleSettingsProvider
+                implementation="com.tencent.jceplugin.language.codeStyle.JceCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider
+                implementation="com.tencent.jceplugin.language.codeStyle.JceLanguageCodeStyleSettingsProvider"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="jce.file.group" popup="false">
+            <action id="jce.GenerateTestCase" class="com.tencent.jceplugin.language.actions.GenerateTestCaseAction"
+                    text="Generate Test Case" description="Test case declaration"
+                    icon="JceIcons.FILE">
+                <keyboard-shortcut first-keystroke="control shift alt T" keymap="$default"/>
+            </action>
+            <add-to-group group-id="ToolsMenu" anchor="before" relative-to-action="ExternalToolsGroup"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>
