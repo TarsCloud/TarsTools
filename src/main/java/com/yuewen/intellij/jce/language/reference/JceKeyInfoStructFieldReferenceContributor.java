@@ -1,0 +1,36 @@
+package com.yuewen.intellij.jce.language.reference;
+
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.*;
+import com.intellij.util.ProcessingContext;
+import com.intellij.util.SmartList;
+import com.yuewen.intellij.jce.language.psi.JceRefStructField;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
+import static com.intellij.patterns.PlatformPatterns.psiElement;
+
+/**
+ * key [structName, field1, field2, ...]
+ */
+public class JceKeyInfoStructFieldReferenceContributor extends PsiReferenceContributor {
+    @Override
+    public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
+        registrar.registerReferenceProvider(psiElement(JceRefStructField.class), new PsiReferenceProvider() {
+            @NotNull
+            @Override
+            public PsiReference[] getReferencesByElement(@NotNull PsiElement element,
+                                                         @NotNull ProcessingContext context) {
+                if (!(element instanceof JceRefStructField)) {
+                    return PsiReference.EMPTY_ARRAY;
+                }
+                JceRefStructField refStructField = (JceRefStructField) element;
+                //struct
+                List<PsiReference> psiReferences = new SmartList<>();
+                psiReferences.add(new JceKeyInfoStructFieldReference(refStructField, new TextRange(0, refStructField.getTextRangeInParent().getLength())));
+                return psiReferences.toArray(new PsiReference[0]);
+            }
+        });
+    }
+}

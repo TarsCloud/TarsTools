@@ -1,3 +1,6 @@
 out
+*.iml
+.gradle
 .idea
-gen
+.DS_Store
+/build

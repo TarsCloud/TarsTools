@@ -1,0 +1,138 @@
+<idea-plugin>
+    <id>com.tencent.jceplugin</id>
+    <name>JCE Support</name>
+    <version>0.3.1</version>
+    <vendor email="harveyxu@tencent.com,kongyuanyuan@yuewen.com" url="http://www.tencent.com">Tencent.</vendor>
+
+    <description><![CDATA[
+      <p>This plugin supports the editing of the Jce/Tars file, providing the following features:</p>
+      <ol>
+            <li>Syntax highlighting</li>
+            <li>Code commenting</li>
+            <li>Formatting</li>
+            <li>Auto Completion</li>
+            <li>Static Analysis</li>
+            <li>......</li>
+      </ol>
+      <p>If any question, contact with harveyxu @ wechat work or <a href="mailto:kongyuanyuan@yuewen.com">kongyuanyuan@yuewen.com</a></p>
+    ]]>
+    </description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends optional="true" config-file="java-plugin.xml">com.intellij.modules.java</depends>
+    <!--    <depends optional="true" config-file="java-plugin.xml">com.intellij.java</depends>-->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <fileTypeFactory implementation="com.yuewen.intellij.jce.language.JceFileTypeFactory"/>
+        <lang.parserDefinition language="Jce"
+                               implementationClass="com.yuewen.intellij.jce.language.JceParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Jce"
+                                       implementationClass="com.yuewen.intellij.jce.language.JceSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="com.yuewen.intellij.jce.language.JceColorSettingsPage"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceFieldTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceIncludeFileAnnotator"/>
+        <annotator language="Jce" implementationClass="com.yuewen.intellij.jce.language.annotator.JceKeyInfoAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceStructTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceEnumTypeAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceFunctionAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceInterfaceAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceFieldDefaultValueAnnotator"/>
+        <annotator language="Jce"
+                   implementationClass="com.yuewen.intellij.jce.language.annotator.JceModuleAnnotator"/>
+        <completion.contributor language="Jce"
+                                implementationClass="com.yuewen.intellij.jce.language.completion.JceCompletionContributor"/>
+        <completion.contributor language="Jce"
+                                implementationClass="com.yuewen.intellij.jce.language.completion.JceCustomTypeCompletionContributor"/>
+        <psi.referenceContributor
+                implementation="com.yuewen.intellij.jce.language.reference.JceTypeReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.yuewen.intellij.jce.language.reference.JceFileReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.yuewen.intellij.jce.language.reference.JceKeyInfoStructReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.yuewen.intellij.jce.language.reference.JceKeyInfoStructFieldReferenceContributor"/>
+        <psi.referenceContributor
+                implementation="com.yuewen.intellij.jce.language.reference.JceFieldDefaultAssignmentReferenceContributor"/>
+        <lang.commenter language="Jce" implementationClass="com.yuewen.intellij.jce.language.JceCommenter"/>
+        <lang.findUsagesProvider language="Jce"
+                                 implementationClass="com.yuewen.intellij.jce.language.JceFindUsagesProvider"/>
+        <lang.elementManipulator forClass="com.yuewen.intellij.jce.language.psi.JceIncludeFilename"
+                                 implementationClass="com.yuewen.intellij.jce.language.manipulator.JceStringManipulator"/>
+        <lang.elementManipulator forClass="com.yuewen.intellij.jce.language.psi.JceFieldType"
+                                 implementationClass="com.yuewen.intellij.jce.language.manipulator.JceFieldTypeManipulator"/>
+        <lang.elementManipulator forClass="com.yuewen.intellij.jce.language.psi.JceRefModule"
+                                 implementationClass="com.yuewen.intellij.jce.language.manipulator.JceRefModuleManipulator"/>
+        <lang.elementManipulator forClass="com.yuewen.intellij.jce.language.psi.JceKeyInfo"
+                                 implementationClass="com.yuewen.intellij.jce.language.manipulator.JceKeyInfoManipulator"/>
+        <lang.refactoringSupport language="Jce"
+                                 implementationClass="com.yuewen.intellij.jce.language.JceRefactoringSupportProvider"/>
+        <lang.foldingBuilder language="Jce"
+                             implementationClass="com.yuewen.intellij.jce.language.JceFoldingBuilder"/>
+        <lang.psiStructureViewFactory language="Jce"
+                                      implementationClass="com.yuewen.intellij.jce.language.JceStructureViewFactory"/>
+        <lang.formatter language="Jce"
+                        implementationClass="com.yuewen.intellij.jce.language.formatter.JceFormattingModelBuilder"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceModuleInfo"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceModulePresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceStructType"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceStructPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceFieldInfo"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceFieldPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceEnumType"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceEnumPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceEnumMember"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceEnumMemberPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceConstType"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceConstPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceInterfaceInfo"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceInterfacePresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceFunctionInfo"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceFunctionPresentationProvider"/>
+        <itemPresentationProvider forClass="com.yuewen.intellij.jce.language.psi.JceFunctionParam"
+                                  implementationClass="com.yuewen.intellij.jce.language.presentation.JceFunctionParamPresentationProvider"/>
+        <gotoSymbolContributor implementation="com.yuewen.intellij.jce.language.JceChooseByNameContributor"/>
+        <include.provider implementation="com.yuewen.intellij.jce.language.JceIncludeProvider"/>
+        <braceMatcher filetype="Jce File" implementationClass="com.yuewen.intellij.jce.language.JceBraceMatcher"/>
+        <quoteHandler fileType="Jce File" className="com.yuewen.intellij.jce.language.JceQuoteMatcher"/>
+        <declarationRangeHandler key="com.yuewen.intellij.jce.language.psi.JceModuleInfo"
+                                 implementationClass="com.yuewen.intellij.jce.language.hint.ModuleDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.yuewen.intellij.jce.language.psi.JceInterfaceInfo"
+                                 implementationClass="com.yuewen.intellij.jce.language.hint.InterfaceDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.yuewen.intellij.jce.language.psi.JceStructType"
+                                 implementationClass="com.yuewen.intellij.jce.language.hint.StructDeclarationRangeHandler"/>
+        <declarationRangeHandler key="com.yuewen.intellij.jce.language.psi.JceEnumType"
+                                 implementationClass="com.yuewen.intellij.jce.language.hint.EnumDeclarationRangeHandler"/>
+        <lang.smartEnterProcessor language="Jce"
+                                  implementationClass="com.yuewen.intellij.jce.language.smartEnter.JceSmartEnterProcessor"/>
+        <breadcrumbsInfoProvider implementation="com.yuewen.intellij.jce.language.breadcrumbs.JceBreadcrumbsProvider"/>
+        <codeStyleSettingsProvider
+                implementation="com.yuewen.intellij.jce.language.codeStyle.JceCodeStyleSettingsProvider"/>
+        <langCodeStyleSettingsProvider
+                implementation="com.yuewen.intellij.jce.language.codeStyle.JceLanguageCodeStyleSettingsProvider"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="jce.file.group" popup="false">
+            <action id="jce.GenerateTestCase" class="com.yuewen.intellij.jce.language.actions.GenerateTestCaseAction"
+                    text="Generate Test Case" description="Test case declaration"
+                    icon="JceIcons.FILE">
+                <keyboard-shortcut first-keystroke="control shift alt T" keymap="$default"/>
+            </action>
+            <add-to-group group-id="ToolsMenu" anchor="before" relative-to-action="ExternalToolsGroup"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>

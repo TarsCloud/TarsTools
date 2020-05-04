@@ -1,0 +1,151 @@
+{
+  parserClass="com.yuewen.intellij.jce.language.parser.JceParser"
+  parserUtilClass="com.yuewen.intellij.jce.language.parser.JceParserUtil"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Jce"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.yuewen.intellij.jce.language.psi"
+  psiImplPackage="com.yuewen.intellij.jce.language.psi.impl"
+
+  elementTypeHolderClass="com.yuewen.intellij.jce.language.psi.JceTypes"
+  elementTypeClass="com.yuewen.intellij.jce.language.psi.JceElementType"
+  tokenTypeClass="com.yuewen.intellij.jce.language.psi.JceTokenType"
+
+  psiImplUtilClass="com.yuewen.intellij.jce.language.psi.impl.JcePsiImplUtil"
+
+  tokens=[
+    SEMICOLON=';'
+    COMMA=','
+    OPEN_BLOCK='{'
+    CLOSE_BLOCK='}'
+    INCLUDE='#include'
+    MODULE='module'
+    INTERFACE='interface'
+    MAP='map'
+    VECTOR='vector'
+    ENUM='enum'
+    STRUCT='struct'
+    REQUIRE='require'
+    OPTIONAL='optional'
+    OUT='out'
+    EQUAL='='
+    MINUS='-'
+    DOUBLE_COLON='::'
+    VOID='void'
+    LESS_THAN="<"
+    OPEN_PARENTHESIS="("
+    OPEN_BRACE="["
+    OPEN_BLOCK="{"
+    GREATER_THAN=">"
+    CLOSE_PARENTHESIS=")"
+    CLOSE_BRACE="]"
+    CLOSE_BLOCK="}"
+    BOOL="bool"
+    BYTE="byte"
+    SHORT="short"
+    INT="int"
+    LONG="long"
+    FLOAT="float"
+    DOUBLE="double"
+    STRING="string"
+    UNSIGNED="unsigned"
+    TRUE="true"
+    FALSE="false"
+    ROUTEKEY="routekey"
+    CONST="const"
+    KEY="key"
+    identifier='regexp:[a-zA-Z_][\w]*'
+    IDENTIFIER='regexp:[a-zA-Z_][\w]*'
+    TAF_IDENTIFIER='regexp:taf_(\w)*'
+    STRING_LITERAL="regexp:(\"(\\\"|([^\"\r\n\\]|\\.)*)\")"
+    WRONG_STRING_LITERAL="regexp:(\"(\\\"|[^\"\r\n])*)"
+    space='regexp:\s+'
+    CRLF='regexp:[\r\n]'
+    comment='regexp:(//.*)|(/\*[\S\s]*?\*/)'
+    LINE_COMMENT='regexp:(//.*)'
+    BLOCK_COMMENT='regexp:(/\*[\S\s]*?\*/)'
+    DOC_COMMENT='regexp:(/\**[\S\s]*?\*/)'
+    NUM_INT='regexp:-?\d\d*'
+    HEX_INT='regexp:0x([a-fA-F]|\d)+'
+    NUM_DOUBLE='regexp:-?(\d+((\.\d+)|(([eE])-?\d+)))'
+  ]
+}
+
+JCE_FILE            ::= ROOT_ITEMS*
+
+private ROOT_ITEMS   ::= (INCLUDE_INFO | MODULE_INFO) {recoverWhile=ROOT_ITEMS_RECOVERY_}
+private ROOT_ITEMS_RECOVERY_ ::= !(INCLUDE | STRING_LITERALS | MODULE_INFO | INCLUDE_INFO | SEMICOLON | IDENTIFIER)
+//#include
+INCLUDE_INFO        ::= INCLUDE INCLUDE_FILENAME {pin=1 methods=[getIncludeFileName getReference getReferences getPresentation] recoverWhile=INCLUDE_RECOVERY_}
+private INCLUDE_RECOVERY_ ::= !(MODULE | INCLUDE | IDENTIFIER)
+INCLUDE_FILENAME    ::= STRING_LITERAL {methods=[getFileName setName getReference getReferences]}
+//module
+MODULE_INFO         ::= MODULE IDENTIFIER OPEN_BLOCK (MODULE_MEMBER)* CLOSE_BLOCK SEMICOLON {pin=1 recoverWhile=MODULE_INFO_RECOVERY_ mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+private MODULE_INFO_RECOVERY_ ::= !(INCLUDE | MODULE)
+//模块内成员
+private MODULE_MEMBER       ::= STRUCT_TYPE | KEY_INFO | ENUM_TYPE | CONST_TYPE | INTERFACE_INFO {recoverWhile=MODULE_MEMBER_RECOVERY_}
+private MODULE_MEMBER_RECOVERY_ ::= !(STRUCT | ENUM | CONST | INTERFACE | KEY | IDENTIFIER | CLOSE_BLOCK | INCLUDE | MODULE)
+//结构体 struct name {...};
+STRUCT_TYPE         ::= STRUCT IDENTIFIER OPEN_BLOCK (FIELD_INFO)* CLOSE_BLOCK SEMICOLON {pin=1 mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+//结构体成员：0 optional int name = '123';
+FIELD_INFO          ::= FIELD_TAG FIELD_LABEL FIELD_TYPE IDENTIFIER FIELD_DEFAULT_ASSIGNMENT? SEMICOLON {pin=1 recoverWhile=FIELD_INFO_RECOVERY_ mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+//字段默认值
+FIELD_DEFAULT_ASSIGNMENT ::= EQUAL STRING_LITERALS {pin=1 recoverWhile=FIELD_INFO_RECOVERY_ methods=[getReference getReferences]}
+//字段出现语法错误时的回退格式
+private FIELD_INFO_RECOVERY_ ::= !(SEMICOLON | FIELD_TAG (FIELD_LABEL | FIELD_TYPE) | CLOSE_BLOCK | STRUCT | ENUM | CONST | INTERFACE | KEY)
+//字段顺序
+FIELD_TAG           ::= NUM_INT {name="field tag"}
+//字段可选项
+FIELD_LABEL         ::= REQUIRE | OPTIONAL {name="require or optional"}
+//字段默认值
+STRING_LITERALS     ::= NUMBERS | IDENTIFIER | STRING_LITERAL | BOOL_VALUES | WRONG_STRING_LITERAL {}
+//字段类型
+FIELD_TYPE          ::= BUILT_IN_TYPES | USER_DEFINE_TYPE | MAP_TYPE | VECTOR_TYPE {methods=[getReferences getReference setName setQualifierName]}
+//引用某个模块下的结构体、枚举、常量等
+REF_MODULE         ::= IDENTIFIER {methods=[getReferences getReference setName]}
+private USER_DEFINE_TYPE    ::= (REF_MODULE DOUBLE_COLON)? IDENTIFIER
+MAP_TYPE            ::= MAP LESS_THAN FIELD_TYPE COMMA FIELD_TYPE GREATER_THAN {pin=1}
+VECTOR_TYPE         ::= VECTOR LESS_THAN FIELD_TYPE GREATER_THAN {pin=1}
+KEY_INFO            ::= KEY OPEN_BRACE REF_STRUCT (COMMA REF_STRUCT_FIELD)* CLOSE_BRACE SEMICOLON {pin=1}
+REF_STRUCT ::= IDENTIFIER {methods=[getReference getReferences]}
+REF_STRUCT_FIELD ::= IDENTIFIER {methods=[getReference getReferences]}
+//枚举
+ENUM_TYPE           ::= ENUM IDENTIFIER OPEN_BLOCK (ENUM_MEMBER)?(COMMA ENUM_MEMBER)* (COMMA)? CLOSE_BLOCK SEMICOLON {pin=1 mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+ENUM_MEMBER         ::= IDENTIFIER (EQUAL NUM_INT)? {pin=1 recoverWhile=ENUM_MEMBER_RECOVERY mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getNameIdentifier getName setName getPresentation]}
+//语法错误时的恢复
+private ENUM_MEMBER_RECOVERY ::= !(COMMA | SEMICOLON | CLOSE_BLOCK)
+//常量
+CONST_TYPE          ::= CONST BUILT_IN_TYPES IDENTIFIER CONST_ASSIGNMENT SEMICOLON {pin=1 mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+CONST_ASSIGNMENT    ::= EQUAL (BOOL_VALUES | STRING_LITERAL | NUMBERS) {pin=1 recoverWhile=CONST_ASSIGNMENT_RECOVERY}
+private CONST_ASSIGNMENT_RECOVERY ::= !(COMMA | SEMICOLON | CLOSE_BLOCK | STRUCT | ENUM | INTERFACE | CONST)
+//接口信息
+INTERFACE_INFO      ::= INTERFACE IDENTIFIER OPEN_BLOCK (FUNCTION_INFO)* CLOSE_BLOCK SEMICOLON {pin=1 mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+//接口方法
+FUNCTION_INFO       ::= RETURN_TYPE IDENTIFIER OPEN_PARENTHESIS FUNCTION_PARAM_LIST? CLOSE_PARENTHESIS SEMICOLON {pin=1 recoverWhile=FUNCTION_INFO_RECOVERY mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getName getNameIdentifier setName getPresentation]}
+//参数语法错误时的恢复
+private FUNCTION_INFO_RECOVERY ::= !(COMMA | RETURN_TYPE | CLOSE_BLOCK | SEMICOLON | CLOSE_PARENTHESIS)
+//方法返回值类型
+RETURN_TYPE         ::= VOID | FIELD_TYPE
+//方法参数列表
+FUNCTION_PARAM_LIST ::= FUNCTION_PARAM (COMMA FUNCTION_PARAM)*
+//方法参数 out为可选值
+FIELD_TYPE_MODIFIER ::= OUT
+FUNCTION_PARAM      ::= FIELD_TYPE_MODIFIER? FIELD_TYPE IDENTIFIER {pin=2 recoverWhile=FUNCTION_PARAM_RECOVERY mixin="com.yuewen.intellij.jce.language.psi.impl.JceNamedElementImpl" implements="com.yuewen.intellij.jce.language.psi.JceNamedElement" methods=[getNameIdentifier setName getName getPresentation]}
+//参数语法错误时的恢复
+private FUNCTION_PARAM_RECOVERY ::= !(COMMA | OUT | CLOSE_PARENTHESIS | CLOSE_BLOCK | SEMICOLON | FIELD_TYPE)
+//基本类型
+BUILT_IN_TYPES      ::= (UNSIGNED UNSIGNED_NUMS) | NUMBER_TYPES | BOOL | STRING
+//无符号的基本类型
+private UNSIGNED_NUMS       ::= BYTE | SHORT | INT
+//基本数字类型
+private NUMBER_TYPES        ::= BYTE | SHORT | INT | LONG | FLOAT | DOUBLE
+//布尔型
+private BOOL_VALUES         ::= TRUE | FALSE
+//数字值
+private NUMBERS             ::= NUM_INT | NUM_DOUBLE | HEX_INT
+
+//关键词
+KEY_WORDS           ::= VOID | BYTE | SHORT | BOOL | INT | LONG | FLOAT | DOUBLE | STRING | MAP | VECTOR |
+                        TRUE | FALSE | UNSIGNED | CONST | OUT | ROUTEKEY | TAF_IDENTIFIER | INCLUDE
+                        STRUCT | KEY | MODULE | INTERFACE | ENUM | REQUIRE | OPTIONAL

@@ -1,0 +1,64 @@
+#include "common.jce"
+/**
+ * ReadX.HerTafExample.obj
+ *
+ * @auther kongyuanyuan
+ * @since 2019/09/30
+ **/
+module servant
+{
+    const int SUCC = 0;
+    const string SUCC = "";
+
+    key[CommonInParam, appId, areaId]
+
+    /**
+     * 通用输入参数
+     */
+    struct CommonInParam
+    {
+        0 optional int appId; // AppId
+        1 optional int areaId; // AreaId
+        2 optional long userId; // 用户ID
+        3 optional string deviceId; // 设备ID
+        4 optional string userIp; // 用户IP
+        5 optional string serverIp; // 服务器IP
+    };
+
+    /**
+     * 通用输出结果
+     */
+    struct CommonOutResult
+    {
+        0 optional int code; // 返回状态码，0成功，其他失败
+        1 optional string message; // 返回提示消息
+    };
+
+    /**
+     * 返回状态码
+     * -1~-1000是预留Code
+     */
+    enum CodeEnum
+    {
+        SUCCESS = 0,  // 成功
+        FAIL = -1, // 失败
+        PARAMETER_ERROR = -2, // 参数错误
+        DB_ERROR = -3, // 数据库错误
+        CACHE_ERROR = -4, // 缓存错误
+    };
+
+
+    interface HerTafExample
+    {
+        // 测试
+        string ping();
+
+        CommonOutResult ping2();
+
+        // 测试cos
+        void testCos(CommonInParam inParam, out CommonOutResult outResult);
+
+        // 测试cmq
+        void testCmq(CommonInParam inParam, vector<string> mqList, out map<string, CommonOutResult> resultMap);
+    };
+};

@@ -1,0 +1,42 @@
+{
+  parserClass="com.yuewen.intellij.jce.language.jcedoc.parser.JceDocParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="JceDoc"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.yuewen.intellij.jce.language.jcedoc.psi"
+  psiImplPackage="com.yuewen.intellij.jce.language.jcedoc.psi.impl"
+
+  elementTypeHolderClass="com.yuewen.intellij.jce.language.jcedoc.psi.JceDocTypes"
+  elementTypeClass="com.yuewen.intellij.jce.language.jcedoc.psi.JceDocElementType"
+  tokenTypeClass="com.yuewen.intellij.jce.language.jcedoc.psi.JceDocTokenType"
+
+  psiImplUtilClass="com.yuewen.intellij.jce.language.jcedoc.psi.impl.JceDocPsiImplUtil"
+
+  tokens=[
+    DOC_COMMENT_START="/**"
+    DOC_COMMENT_LEADING_ASTRISK="*"
+    DOC_COMMENT_END="*/"
+    DOC_INLINE_TAG_START="{"
+    DOC_INLINE_TAG_END="}"
+    DOC_TAG_NAME="regexp:@code|@literal|(@[^\ \t\f\n\r\}]+)"
+    DOC_TAG_VALUE_LT="<"
+    DOC_TAG_VALUE_GT=">"
+    DOC_TAG_VALUE_COMMA=","
+    WHITE_DOC_SPACE_CHAR="regexp:[ \t\f\n\r]"
+    WHITE_DOC_SPACE_NO_LR="regexp:[ \t\f]"
+    DIGIT="regexp:\d"
+    ALPHA="regexp:[a-zA-Z]"
+    IDENTIFIER="regexp:[a-zA-Z]([a-zA-Z]|\d|[:.-])*"
+    TAG_IDENTIFIER="regexp:[^ \t\f\n\r]+"
+    INLINE_TAG_IDENTIFIER="regexp:[^ \t\f\n\r}]+"
+  ]
+}
+
+file ::= comment
+
+comment ::= DOC_COMMENT_START (DOC_COMMENT_DATA | DOC_SPACE | DOC_TAG_VALUE_TOKEN | DOC_TAG_VALUE_LPAREN | DOC_TAG_VALUE_RPAREN
+| DOC_TAG_VALUE_SHARP_TOKEN | DOC_TAG_VALUE_COMMA | DOC_TAG_NAME | IDENTIFIER | DOC_TAG_VALUE_GT | DOC_TAG_VALUE_LT | DOC_INLINE_TAG_START
+TAG_DOC_SPACE | DOC_INLINE_TAG_END | DOC_COMMENT_LEADING_ASTRISK | DOC_COMMENT_BAD_CHARACTER)* DOC_COMMENT_END?
+//comment ::= DOC_COMMENT_START (DOC_COMMENT_DATA | DOC_COMMENT_LEADING_ASTRISK | DOC_SPACE | DOC_COMMENT_BAD_CHARACTER)* DOC_COMMENT_END?

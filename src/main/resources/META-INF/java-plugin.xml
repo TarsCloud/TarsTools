@@ -1,0 +1,12 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="JAVA"
+                                        implementationClass="com.yuewen.intellij.jce.language.codeInsight.JceJavaLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="Jce"
+                                        implementationClass="com.yuewen.intellij.jce.language.codeInsight.JceLineMarkerProvider"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
