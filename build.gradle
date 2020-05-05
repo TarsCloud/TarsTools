@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.16'
+    id 'org.jetbrains.intellij' version '0.4.19'
 }
 
 group 'com.tencent'
@@ -12,33 +12,25 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/gen', 'src/main/java']
-        }
-        resources {
-            srcDirs = ['src/main/resources']
-        }
-    }
-}
+sourceSets.main.java.srcDirs 'src/main/gen'
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.1'
     updateSinceUntilBuild false
 }
 
 patchPluginXml {
-    changeNotes """
+    changeNotes """<![CDATA[
+      <p>v0.3.1 2020/05/05</p>
       <ul>
       <li>更完善的自动补全.</li>
       <li>支持识别自动生成的java代码并相互跳转.</li>
       <li>自动生成测试用例.</li>
       <li>支持tars.</li>
-      </ul>"""
+      </ul>
+      ]]>"""
 }

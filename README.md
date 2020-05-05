@@ -4,11 +4,17 @@
 
 ## 安装说明
 
+### 网络安装
+
+本插件已经在JetBrains Plugin Repository发布，通过IDE的Plugin入口，查找**Jce Support**，可进行在线安装或更新。
+
+### 本地安装
+
 下载本项目的dist文件夹下的[jce-support-0.3.1.jar文件](dist/jce-support-0.3.1.jar), 然后再通过Intellij Idea的设置菜单安装本地插件
 
 ![install-1](imgs/install-1.png)
 
-> 注意，如果本来安装过`Jce Support For Intellij`插件需要先卸载老插件
+> 注意，通过本方法安装的插件，将不会自动更新
 
 ## 功能介绍
 
