@@ -1,6 +1,6 @@
 # Jce/Tars Support
 
-该项目为实现编辑Jce/Tars文件的JetBrains插件，支持Intellij IDEA、Android Studio、PhpStorm、WebStorm、GoLand、CLion等Intellij IDE，
+该项目为实现编辑Jce/Tars文件的JetBrains插件，支持Intellij IDEA、Android Studio、PhpStorm、WebStorm、GoLand、CLion等Intellij IDE。
 
 -------------------------------
 
@@ -47,3 +47,14 @@
 
 1. 本项目利用Intellij IDEA开发，请参考Intellij IDEA的[插件开发](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html)，可使用Intellij IDEA Community Edition来维护本项目的插件
 2. src/main/java下的代码为插件所有逻辑, src/main/resources下的代码为插件的资源文件
+
+-------------------------------
+
+## 致谢
+
+在开发过程中，有如下人员付出了卓越贡献：
+
+* Harvey Xu
+* Kong Yuanyuan
+
+还有不少朋友和同事，提出了宝贵意见，欢迎继续支持。
