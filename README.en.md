@@ -1,6 +1,7 @@
 # Jce/Tars Support
  
 This program is a JetBrains plugin tool that implements the editing for Jce/Tars files. The tool supports Intellij IDE such as Intellij IDEA, Android Studio, PhpStorm, Webstorm, Goland, and CLion.
+
 -------------------------------
  
 ## Features
@@ -15,7 +16,7 @@ This program is a JetBrains plugin tool that implements the editing for Jce/Tars
 8. Automatically generate test cases
 9. Jump between java and jce
  
-For the development experience, please check [feature screenshot](./doc/features.md)
+Please check these [screenshots](./doc/features.md) to see the features in action. 
  
 -------------------------------
  
