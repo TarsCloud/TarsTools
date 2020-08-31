@@ -1,4 +1,5 @@
 # Jce/Tars Support
+[点我查看中文版](README.md)
  
 This program is a JetBrains plugin tool that implements the editing for Jce/Tars files. The tool supports Intellij IDE such as Intellij IDEA, Android Studio, PhpStorm, Webstorm, Goland, and CLion.
 
@@ -30,7 +31,7 @@ This method for installation is most recommended.
  
 ### Local installation
  
-Download the [jce-support-0.3.1.zip file] (dist/jce-support-0.3.1.zip) under the dist folder of this project, and then install the local plug-in through the Intellij Idea setup menu.
+Download the [jce-support-0.3.1.zip](dist/jce-support-0.3.1.zip) under the dist folder of this project, and then install the local plug-in through the Intellij Idea setup menu.
  
 Note that the plug-in installed via this method will not be automatically updated
  
