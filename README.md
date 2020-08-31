@@ -1,3 +1,5 @@
+[In English](https://github.com/TarsCloud/TarsTools/blob/master/README.en.md)
+
 # Jce/Tars Support
 
 该项目为实现编辑Jce/Tars文件的JetBrains插件，支持Intellij IDEA、Android Studio、PhpStorm、WebStorm、GoLand、CLion等Intellij IDE。
