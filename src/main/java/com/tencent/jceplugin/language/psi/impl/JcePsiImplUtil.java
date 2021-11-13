@@ -1,4 +1,4 @@
-/**
+/*
  * Tencent is pleased to support the open source community by making Tars available.
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
@@ -35,6 +35,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class JcePsiImplUtil {
+    private JcePsiImplUtil() {
+    }
+
     @NotNull
     public static String getIncludeFileName(JceIncludeInfo includeInfo) {
         if (includeInfo.getIncludeFilename() == null) {
@@ -626,5 +629,15 @@ public class JcePsiImplUtil {
                 return AllIcons.Nodes.Constant;
             }
         };
+    }
+
+    /**
+     * 是否是必填字段
+     *
+     * @param fieldLabel 字段
+     * @return 是否是必填字段
+     */
+    public static boolean isRequired(JceFieldLabel fieldLabel) {
+        return fieldLabel.getFirstChild().getNode().getElementType() == JceTypes.REQUIRE;
     }
 }

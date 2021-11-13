@@ -97,7 +97,7 @@ private FIELD_INFO_RECOVERY_ ::= !(SEMICOLON | FIELD_TAG (FIELD_LABEL | FIELD_TY
 //字段顺序
 FIELD_TAG           ::= NUM_INT {name="field tag"}
 //字段可选项
-FIELD_LABEL         ::= REQUIRE | OPTIONAL {name="require or optional"}
+FIELD_LABEL         ::= REQUIRE | OPTIONAL {name="require or optional" methods=[isRequired]}
 //字段默认值
 STRING_LITERALS     ::= NUMBERS | IDENTIFIER | STRING_LITERAL | BOOL_VALUES | WRONG_STRING_LITERAL {}
 //字段类型

@@ -1,4 +1,4 @@
-[In English](https://github.com/TarsCloud/TarsTools/blob/master/README.en.md)
+[In English](README.en.md)
 
 # Jce/Tars Support
 
@@ -17,6 +17,7 @@
 7. 智能重命名
 8. 自动生成测试用例
 9. java与jce之间相互跳转
+10. 可以转换为proto文件
 
 具体开发体验，可查看[功能截图](./doc/features.md)
 
@@ -32,7 +33,7 @@
 
 ### 本地安装
 
-下载本项目的dist文件夹下的[jce-support-0.3.1.zip文件](dist/jce-support-0.3.1.zip), 然后再通过Intellij Idea的设置菜单安装本地插件。
+下载本项目的dist文件夹下的[jce-support-0.3.2.zip文件](dist/jce-support-0.3.2.zip), 然后再通过Intellij Idea的设置菜单安装本地插件。
 
 注意，通过本方法安装的插件，将不会自动更新
 
@@ -47,7 +48,9 @@
 
 ## 维护说明
 
-1. 本项目利用Intellij IDEA开发，请参考Intellij IDEA的[插件开发](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html)，可使用Intellij IDEA Community Edition来维护本项目的插件
+1. 本项目利用Intellij IDEA开发，请参考Intellij
+   IDEA的[插件开发](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html)，可使用Intellij IDEA Community
+   Edition来维护本项目的插件
 2. src/main/java下的代码为插件所有逻辑, src/main/resources下的代码为插件的资源文件
 
 -------------------------------

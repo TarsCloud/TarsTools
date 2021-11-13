@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -47,18 +47,32 @@ public class JceFieldTypeReference extends PsiReferenceBase<JceFieldType> implem
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        JceModuleInfo moduleInfo = PsiTreeUtil.getParentOfType(myElement, JceModuleInfo.class);
+        List<JceModuleInfo> moduleList = new ArrayList<>();
         if (getQualifier() != null && getQualifier().getReference() != null) {
-            moduleInfo = (JceModuleInfo) getQualifier().getReference().resolve();
+            ResolveResult[] resolveResults = ((PsiPolyVariantReference) getQualifier().getReference()).multiResolve(false);
+            for (ResolveResult resolveResult : resolveResults) {
+                moduleList.add((JceModuleInfo) resolveResult.getElement());
+            }
+        } else {
+            JceModuleInfo parentModuleInfo = PsiTreeUtil.getParentOfType(myElement, JceModuleInfo.class);
+            if (parentModuleInfo != null && parentModuleInfo.getIdentifier() != null && !parentModuleInfo.getIdentifier().getText().isEmpty()) {
+                String moduleName = parentModuleInfo.getIdentifier().getText();
+                //处理当前module还存在于其他include的文件中的情况。
+                // 比如A.jce定义了common模块，include了B.jce，B.jce里也有common模块。此时A.jce不仅可以使用A.jce文件里common模块的结构体，也能使用B.jce文件里common模块的结构体。
+                List<JceModuleInfo> resolvedModules = JceUtil.findModules(parentModuleInfo.getContainingFile(), moduleName, true, false);
+                moduleList.addAll(resolvedModules);
+            }
         }
         List<ResolveResult> results = new ArrayList<>();
-        final List<JceStructType> structList = JceUtil.findStruct(moduleInfo, incompleteCode ? null : key);
-        for (JceStructType structType : structList) {
-            results.add(new PsiElementResolveResult(structType));
-        }
-        final List<JceEnumType> enumList = JceUtil.findEnum(moduleInfo, incompleteCode ? null : key);
-        for (JceEnumType enumType : enumList) {
-            results.add(new PsiElementResolveResult(enumType));
+        for (JceModuleInfo moduleInfo : moduleList) {
+            final List<JceStructType> structList = JceUtil.findStruct(moduleInfo, incompleteCode ? null : key);
+            for (JceStructType structType : structList) {
+                results.add(new PsiElementResolveResult(structType));
+            }
+            final List<JceEnumType> enumList = JceUtil.findEnum(moduleInfo, incompleteCode ? null : key);
+            for (JceEnumType enumType : enumList) {
+                results.add(new PsiElementResolveResult(enumType));
+            }
         }
         return results.toArray(new ResolveResult[0]);
     }

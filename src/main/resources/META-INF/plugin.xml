@@ -18,14 +18,13 @@
     ]]>
     </description>
 
-    <idea-version since-build="191" />
+    <idea-version since-build="191"/>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
     <depends optional="true" config-file="java-plugin.xml">com.intellij.modules.java</depends>
-    <!--    <depends optional="true" config-file="java-plugin.xml">com.intellij.java</depends>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -136,5 +135,14 @@
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
         </group>
+        <action id="com.tencent.jceplugin.language.actions.GenerateProtobufFileAction"
+                class="com.tencent.jceplugin.language.actions.GenerateProtobufFileAction"
+                text="Convert JceFile to Protobuf" description="Convert Jce to Proto file in proto3"
+                icon="JceIcons.FILE">
+            <add-to-group group-id="ToolsMenu" anchor="after" relative-to-action="jce.GenerateTestCase"/>
+            <add-to-group group-id="CodeMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="jce.GenerateTestCase"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="jce.GenerateTestCase"/>
+        </action>
     </actions>
 </idea-plugin>
