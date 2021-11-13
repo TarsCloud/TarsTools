@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -16,6 +16,9 @@
 
 package com.tencent.jceplugin.language;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -483,5 +486,68 @@ public class JceUtil {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public static PsiElement getPsiElement(@NotNull AnActionEvent event) {
+        PsiElement element = event.getData(CommonDataKeys.PSI_ELEMENT);
+        if (element == null) {
+            PsiFile jceFile = event.getData(CommonDataKeys.PSI_FILE);
+            Caret caret = event.getData(CommonDataKeys.CARET);
+            if (jceFile instanceof JceFile && caret != null) {
+                element = jceFile.findElementAt(caret.getOffset());
+            }
+        }
+        return element;
+    }
+
+    @Nullable
+    public static JceFile getJceFile(@NotNull AnActionEvent e) {
+        if (e.getData(CommonDataKeys.PSI_FILE) instanceof JceFile) {
+            return (JceFile) e.getData(CommonDataKeys.PSI_FILE);
+        }
+        return null;
+    }
+
+    public static String convertToSnakeCase(String name) {
+        char[] chars = name.toCharArray();
+        StringBuilder sb = new StringBuilder(name.length());
+        boolean needSlash = false;
+        for (char aChar : chars) {
+            if (!Character.isAlphabetic(aChar) && !Character.isDigit(aChar)) {
+                //如果遇到了非英文字母数字，就意味着在下次输出英文字母之前要先输出一个下划线
+                if (sb.length() > 0) {
+                    //在开头不要输出下划线
+                    needSlash = true;
+                }
+            } else {
+                if (needSlash || (Character.isUpperCase(aChar) && sb.length() > 0)) {
+                    sb.append('_');
+                    needSlash = false;
+                }
+                sb.append(Character.toLowerCase(aChar));
+            }
+        }
+        return sb.toString();
+    }
+
+    public static String capitalize(String name) {
+        char[] chars = name.toCharArray();
+        StringBuilder sb = new StringBuilder(name.length());
+        boolean needSlash = false;
+        for (char aChar : chars) {
+            if (!Character.isAlphabetic(aChar) && !Character.isDigit(aChar)) {
+                //如果遇到了非英文字母数字，就意味着在下次输出英文字母之前要先输出一个下划线
+                needSlash = true;
+            } else {
+                if (needSlash || sb.length() == 0) {
+                    sb.append(Character.toUpperCase(aChar));
+                    needSlash = false;
+                } else {
+                    sb.append(aChar);
+                }
+            }
+        }
+        return sb.toString();
     }
 }

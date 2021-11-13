@@ -40,6 +40,9 @@ module servant
      */
     enum CodeEnum
     {
+        /**
+         * 成功
+         */
         SUCCESS = 0,  // 成功
         FAIL = -1, // 失败
         PARAMETER_ERROR = -2, // 参数错误
@@ -55,7 +58,12 @@ module servant
 
         CommonOutResult ping2();
 
-        // 测试cos
+        /**
+         * 测试cos
+         *
+         * @param inParam inParam
+         * @param outResult out
+         */
         void testCos(CommonInParam inParam, out CommonOutResult outResult);
 
         // 测试cmq
