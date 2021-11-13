@@ -65,7 +65,6 @@
     comment='regexp:(//.*)|(/\*[\S\s]*?\*/)'
     LINE_COMMENT='regexp:(//.*)'
     BLOCK_COMMENT='regexp:(/\*[\S\s]*?\*/)'
-    DOC_COMMENT='regexp:(/\**[\S\s]*?\*/)'
     NUM_INT='regexp:-?\d\d*'
     HEX_INT='regexp:0x([a-fA-F]|\d)+'
     NUM_DOUBLE='regexp:-?(\d+((\.\d+)|(([eE])-?\d+)))'

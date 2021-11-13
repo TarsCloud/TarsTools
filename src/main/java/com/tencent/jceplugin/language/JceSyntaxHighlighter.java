@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -155,7 +155,7 @@ public class JceSyntaxHighlighter extends SyntaxHighlighterBase {
                 || tokenType.equals(JceTypes.NUM_DOUBLE)
                 || tokenType.equals(JceTypes.HEX_INT)) {
             return NUMBER_KEY;
-        } else if (tokenType.equals(JceTypes.BLOCK_COMMENT) || tokenType.equals(JceTypes.DOC_COMMENT) || tokenType.equals(JceElementType.DOC_COMMENT)) {
+        } else if (tokenType.equals(JceTypes.BLOCK_COMMENT) || tokenType.equals(JceElementType.DOC_COMMENT)) {
             return BLOCK_COMMENT_KEYS;
         } else if (tokenType.equals(JceTypes.LINE_COMMENT)) {
             return LINE_COMMENT_KEYS;
