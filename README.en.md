@@ -16,6 +16,7 @@ This program is a JetBrains plugin tool that implements the editing for Jce/Tars
 7. Smart Renaming
 8. Automatically generate test cases
 9. Jump between java and jce
+10. Convert to protobuf file
  
 Please check these [screenshots](./doc/features.md) to see the features in action. 
  
@@ -31,7 +32,7 @@ This method for installation is most recommended.
  
 ### Local installation
  
-Download the [jce-support-0.3.1.zip](dist/jce-support-0.3.1.zip) under the dist folder of this project, and then install the local plug-in through the Intellij Idea setup menu.
+Download the [jce-support-0.3.2.zip](dist/jce-support-0.3.2.zip) under the dist folder of this project, and then install the local plug-in through the Intellij Idea setup menu.
  
 Note that the plug-in installed via this method will not be automatically updated
  

@@ -1,4 +1,4 @@
-/**
+/*
  * Tencent is pleased to support the open source community by making Tars available.
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
@@ -18,22 +18,14 @@ package com.tencent.jceplugin.language.actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.containers.JBIterable;
+import com.tencent.jceplugin.language.JceUtil;
 import com.tencent.jceplugin.language.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -43,9 +35,9 @@ public class GenerateTestCaseAction extends AnAction implements DumbAware {
     @Override
     public void update(@NotNull AnActionEvent event) {
         // Using the event, evaluate the context, and enable or disable the action.
-        JBIterable<VirtualFile> files = getJceFiles(event);
-        if (!files.isEmpty()) {
-            PsiElement element = getPsiElement(event);
+        JceFile jceFile = JceUtil.getJceFile(event);
+        if (jceFile != null) {
+            PsiElement element = JceUtil.getPsiElement(event);
             PsiElement parent = PsiTreeUtil.findFirstParent(element, e -> e instanceof JceStructType
                     || e instanceof JceFunctionInfo || e instanceof JceInterfaceInfo || e instanceof JceModuleInfo);
             if (parent != null) {
@@ -56,37 +48,13 @@ public class GenerateTestCaseAction extends AnAction implements DumbAware {
         event.getPresentation().setEnabledAndVisible(false);
     }
 
-    @Nullable
-    private static PsiElement getPsiElement(@NotNull AnActionEvent event) {
-        PsiElement element = event.getData(CommonDataKeys.PSI_ELEMENT);
-        if (element == null) {
-            PsiFile jceFile = event.getData(CommonDataKeys.PSI_FILE);
-            Caret caret = event.getData(CommonDataKeys.CARET);
-            if (jceFile instanceof JceFile && caret != null) {
-                element = jceFile.findElementAt(caret.getOffset());
-            }
-        }
-        return element;
-    }
-
-    @NotNull
-    private static JBIterable<VirtualFile> getJceFiles(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        JBIterable<VirtualFile> files = JBIterable.of(e.getData(LangDataKeys.VIRTUAL_FILE_ARRAY));
-        if (project == null || files.isEmpty()) {
-            return JBIterable.empty();
-        }
-        PsiManager manager = PsiManager.getInstance(project);
-        return files.filter(o -> manager.findFile(o) instanceof JceFile);
-    }
-
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         // Using the event, implement an action. For example, create and show a dialog.
         // Using the event, create and show a dialog
         StringBuilder dlgMessageBuilder = new StringBuilder();
         String dlgTitle = "";
-        PsiElement element = getPsiElement(event);
+        PsiElement element = JceUtil.getPsiElement(event);
         PsiElement parent = PsiTreeUtil.findFirstParent(element, e -> e instanceof JceStructType
                 || e instanceof JceFunctionInfo || e instanceof JceInterfaceInfo || e instanceof JceModuleInfo);
         if (parent instanceof JceStructType) {

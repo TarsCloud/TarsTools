@@ -1,4 +1,4 @@
-/**
+/*
  * Tencent is pleased to support the open source community by making Tars available.
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
@@ -31,6 +31,7 @@ import com.tencent.jceplugin.language.psi.JceTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class JceFormattingModelBuilder implements CustomFormattingModelBuilder {
+
     @NotNull
     @Override
     public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
@@ -76,10 +77,6 @@ public class JceFormattingModelBuilder implements CustomFormattingModelBuilder {
                 .spaces(commonSettings.SPACE_BEFORE_METHOD_PARENTHESES ? 1 : 0)
                 .before(JceTypes.OPEN_BLOCK)
                 .blankLines(0)
-                .after(TokenSet.create(JceTypes.DOC_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT))
-                .blankLines(0)
-                .after(TokenSet.create(JceTypes.DOC_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT))
-                .blankLines(0)
                 .around(JceParserDefinition.INDEPENDENT_LINE_DEFINITIONS)
                 .blankLines(0)
                 .around(JceParserDefinition.INDEPENDENT_LINE_DEFINITIONS)
@@ -114,8 +111,6 @@ public class JceFormattingModelBuilder implements CustomFormattingModelBuilder {
                 .spaces(1)
                 .withinPair(JceTypes.OPEN_BRACE, JceTypes.CLOSE_BRACE)
                 .spaceIf(commonSettings.SPACE_WITHIN_BRACKETS)
-                .after(TokenSet.create(JceTypes.DOC_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT))
-                .lineBreakInCode()
                 .before(JceTypes.FIELD_LABEL)
                 .spaces(1)
                 .before(JceTypes.BUILT_IN_TYPES)
