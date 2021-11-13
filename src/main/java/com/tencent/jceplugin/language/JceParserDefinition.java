@@ -1,4 +1,4 @@
-/**
+/*
  * Tencent is pleased to support the open source community by making Tars available.
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
@@ -39,7 +39,7 @@ import java.util.Set;
 
 public class JceParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(JceTypes.LINE_COMMENT, JceTypes.BLOCK_COMMENT, JceTypes.DOC_COMMENT, JceElementType.DOC_COMMENT);
+    public static final TokenSet COMMENTS = TokenSet.create(JceTypes.LINE_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT);
     public static final TokenSet OPEN_BRACES = TokenSet.create(JceTypes.LESS_THAN, JceTypes.OPEN_BLOCK, JceTypes.OPEN_BRACE, JceTypes.OPEN_PARENTHESIS);
     public static final TokenSet CLOSE_BRACES = TokenSet.create(JceTypes.GREATER_THAN, JceTypes.CLOSE_BLOCK, JceTypes.CLOSE_BRACE, JceTypes.CLOSE_PARENTHESIS);
     public static final TokenSet ALL_BRACES = TokenSet.orSet(OPEN_BRACES, CLOSE_BRACES);
@@ -50,12 +50,12 @@ public class JceParserDefinition implements ParserDefinition {
             JceTypes.FIELD_INFO);
     public static final TokenSet CONTAINER_MEMBERS = TokenSet.create(JceTypes.STRUCT_TYPE, JceTypes.FIELD_INFO, JceTypes.KEY_INFO,
             JceTypes.FUNCTION_INFO, JceTypes.ENUM_TYPE, JceTypes.ENUM_MEMBER, JceTypes.INTERFACE_INFO, JceTypes.FUNCTION_PARAM_LIST,
-            JceTypes.FUNCTION_PARAM, JceTypes.LINE_COMMENT, JceTypes.DOC_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT,
+            JceTypes.FUNCTION_PARAM, JceTypes.LINE_COMMENT, JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT,
             JceTypes.CONST_TYPE, JceTypes.CONST_ASSIGNMENT, JceTypes.FIELD_DEFAULT_ASSIGNMENT);
     public static final TokenSet INDEPENDENT_LINE_DEFINITIONS = TokenSet.create(JceTypes.INCLUDE_INFO, JceTypes.MODULE_INFO,
             JceTypes.INTERFACE_INFO, JceTypes.FUNCTION_INFO, JceTypes.STRUCT_TYPE, JceTypes.ENUM_TYPE, JceTypes.CONST_TYPE,
             JceTypes.KEY_INFO);
-    public static final TokenSet ALIGNMENT_ELEMENT = TokenSet.create(JceTypes.LINE_COMMENT, JceTypes.DOC_COMMENT,
+    public static final TokenSet ALIGNMENT_ELEMENT = TokenSet.create(JceTypes.LINE_COMMENT,
             JceTypes.BLOCK_COMMENT, JceElementType.DOC_COMMENT, JceTypes.ENUM_MEMBER, JceTypes.FIELD_TAG,
             JceTypes.FIELD_LABEL, JceTypes.FIELD_TYPE, JceTypes.IDENTIFIER);
 
