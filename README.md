@@ -33,7 +33,7 @@
 
 ### 本地安装
 
-下载本项目的dist文件夹下的[jce-support-0.3.2.zip文件](dist/jce-support-0.3.2.zip), 然后再通过Intellij Idea的设置菜单安装本地插件。
+下载本项目的dist文件夹下的[jce-support-0.3.3.zip文件](dist/jce-support-0.3.3.zip), 然后再通过Intellij Idea的设置菜单安装本地插件。
 
 注意，通过本方法安装的插件，将不会自动更新
 
@@ -52,6 +52,13 @@
    IDEA的[插件开发](http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started.html)，可使用Intellij IDEA Community
    Edition来维护本项目的插件
 2. src/main/java下的代码为插件所有逻辑, src/main/resources下的代码为插件的资源文件
+3. 右键如下文件选择*Run JFlex Generator*，选择路径时可以选择项目根目录
+    1. `src/main/java/com/tencent/jceplugin/language/_JceLexer.flex`
+    2. `src/main/java/com/tencent/jceplugin/language/jcedoc/_JceDocLexer.flex`
+4. 右键如下文件选择*Generate Parser Code*
+    1. `src/main/java/com/tencent/jceplugin/language/jce-grammar.bnf`
+    2. `src/main/java/com/tencent/jceplugin/language/jcedoc/jcedoc.bnf`
+5. 然后就可以运行`gradle runIde`本地调试了
 
 -------------------------------
 

@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.tencent'
-version '0.3.2'
+version '0.3.3'
 
 sourceCompatibility = 1.8
 
@@ -24,7 +24,11 @@ intellij {
 }
 
 patchPluginXml {
-    changeNotes """<p>v0.3.2 2021/11/07</p>
+    changeNotes """<p>v0.3.3 2021/11/22</p>
+      <ul>
+      <li>修复Jce转Proto时可能会出现并发修改异常的问题.</li>
+      </ul>
+      <p>v0.3.2 2021/11/07</p>
       <ul>
       <li>修复同名module分布在多个文件时会解析不到其他文件中该module里的符号的问题.</li>
       <li>支持自动转换为proto文件.</li>

@@ -250,14 +250,19 @@ public class ModulePsiParser {
             return new JceBuiltInBaseType(fieldType.getBuiltInTypes().getText().toLowerCase());
         } else {
             assert fieldType.getReference() != null;
-            return psiTypeMap.computeIfAbsent(fieldType.getReference().resolve(), psiElement -> {
-                if (psiElement instanceof JceStructType) {
-                    return parseStruct((JceStructType) psiElement);
-                } else {
-                    assert psiElement instanceof JceEnumType;
-                    return parseEnum((JceEnumType) psiElement);
-                }
-            });
+            PsiElement psiElement = fieldType.getReference().resolve();
+            JceType jceType = psiTypeMap.get(psiElement);
+            if (jceType != null) {
+                return jceType;
+            }
+            if (psiElement instanceof JceStructType) {
+                jceType = parseStruct((JceStructType) psiElement);
+            } else {
+                assert psiElement instanceof JceEnumType;
+                jceType = parseEnum((JceEnumType) psiElement);
+            }
+            psiTypeMap.put(psiElement, jceType);
+            return jceType;
         }
     }
 }
