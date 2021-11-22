@@ -3,15 +3,41 @@ package com.tencent.jceplugin.language.actions.common;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tencent.jceplugin.language.JceUtil;
+import com.tencent.jceplugin.language.actions.common.element.JceBuiltInBaseType;
+import com.tencent.jceplugin.language.actions.common.element.JceEnum;
 import com.tencent.jceplugin.language.actions.common.element.JceEnumMember;
+import com.tencent.jceplugin.language.actions.common.element.JceField;
+import com.tencent.jceplugin.language.actions.common.element.JceFunction;
+import com.tencent.jceplugin.language.actions.common.element.JceFunctionParameter;
+import com.tencent.jceplugin.language.actions.common.element.JceInterface;
+import com.tencent.jceplugin.language.actions.common.element.JceListType;
 import com.tencent.jceplugin.language.actions.common.element.JceMapType;
-import com.tencent.jceplugin.language.actions.common.element.*;
-import com.tencent.jceplugin.language.psi.*;
+import com.tencent.jceplugin.language.actions.common.element.JceModule;
+import com.tencent.jceplugin.language.actions.common.element.JceStruct;
+import com.tencent.jceplugin.language.actions.common.element.JceType;
+import com.tencent.jceplugin.language.psi.JceElementType;
+import com.tencent.jceplugin.language.psi.JceEnumType;
+import com.tencent.jceplugin.language.psi.JceFieldInfo;
+import com.tencent.jceplugin.language.psi.JceFieldType;
+import com.tencent.jceplugin.language.psi.JceFunctionInfo;
+import com.tencent.jceplugin.language.psi.JceFunctionParamList;
+import com.tencent.jceplugin.language.psi.JceInterfaceInfo;
+import com.tencent.jceplugin.language.psi.JceModuleInfo;
+import com.tencent.jceplugin.language.psi.JceNamedElement;
+import com.tencent.jceplugin.language.psi.JceStructType;
+import com.tencent.jceplugin.language.psi.JceTypes;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -110,7 +136,7 @@ public class ModulePsiParser {
             lastOrdinal = jceEnumMember.getNumInt() != null && !jceEnumMember.getNumInt().getText().isEmpty()
                     ? NumberUtils.toInt(jceEnumMember.getNumInt().getText()) : lastOrdinal + 1;
             list.add(new JceEnumMember(jceEnumMember.getName(), lastOrdinal,
-                    getCommentText(getCommentElement(PsiTreeUtil.skipWhitespacesBackward(jceEnumMember)))));
+                    getCommentText(getCommentElementWithBlockForward(jceEnumMember.getNextSibling()))));
         }
         return list;
     }
@@ -140,9 +166,15 @@ public class ModulePsiParser {
         return getCommentElement(PsiTreeUtil.skipWhitespacesBackward(psiElement));
     }
 
-    @Nullable
-    private static PsiElement getCommentElementWithBlockForward(PsiElement psiElement) {
-        return getCommentElement(PsiTreeUtil.skipWhitespacesForward(psiElement));
+    @NotNull
+    private static PsiElement[] getCommentElementWithBlockForward(PsiElement psiElement) {
+        List<PsiElement> commentElementList = new ArrayList<>();
+        PsiElement lastCommentElement = getCommentElement(PsiTreeUtil.skipWhitespacesForward(psiElement));
+        while (lastCommentElement != null) {
+            commentElementList.add(lastCommentElement);
+            lastCommentElement = getCommentElement(PsiTreeUtil.skipWhitespacesForward(lastCommentElement));
+        }
+        return commentElementList.toArray(new PsiElement[0]);
     }
 
     private static PsiElement getCommentElement(PsiElement prevElement) {
@@ -153,6 +185,17 @@ public class ModulePsiParser {
                 || prevElement.getNode().getElementType() == JceTypes.BLOCK_COMMENT
                 || prevElement.getNode().getElementType() == JceElementType.DOC_COMMENT
                 ? prevElement : null;
+    }
+
+    private static String getCommentText(@NotNull PsiElement[] elements) {
+        StringBuilder sb = new StringBuilder();
+        for (PsiElement element : elements) {
+            String commentText = getCommentText(element);
+            if (StringUtils.isNotBlank(commentText)) {
+                sb.append(commentText).append('\n');
+            }
+        }
+        return sb.toString().trim();
     }
 
     private static String getCommentText(PsiElement element) {

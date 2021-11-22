@@ -28,13 +28,25 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ArrayUtil;
 import com.tencent.jceplugin.language.JceUtil;
 import com.tencent.jceplugin.language.actions.common.ModulePsiParser;
-import com.tencent.jceplugin.language.actions.common.element.*;
+import com.tencent.jceplugin.language.actions.common.element.JceBuiltInBaseType;
+import com.tencent.jceplugin.language.actions.common.element.JceEnum;
+import com.tencent.jceplugin.language.actions.common.element.JceEnumMember;
+import com.tencent.jceplugin.language.actions.common.element.JceField;
+import com.tencent.jceplugin.language.actions.common.element.JceFunction;
+import com.tencent.jceplugin.language.actions.common.element.JceFunctionParameter;
+import com.tencent.jceplugin.language.actions.common.element.JceInterface;
+import com.tencent.jceplugin.language.actions.common.element.JceListType;
+import com.tencent.jceplugin.language.actions.common.element.JceMapType;
+import com.tencent.jceplugin.language.actions.common.element.JceModule;
+import com.tencent.jceplugin.language.actions.common.element.JceStruct;
+import com.tencent.jceplugin.language.actions.common.element.JceType;
 import com.tencent.jceplugin.language.actions.dialogs.Notification;
 import com.tencent.jceplugin.language.psi.JceFile;
 import com.tencent.jceplugin.language.psi.JceModuleInfo;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -80,7 +92,8 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
             try {
                 VirtualFile childData = finalJceModule.getContainingFile().getVirtualFile().getParent()
                         .createChildData(event.getProject(), fileName);
-                childData.setBinaryContent(protoContent.getBytes());
+                childData.setCharset(StandardCharsets.UTF_8);
+                childData.setBinaryContent(protoContent.getBytes(StandardCharsets.UTF_8));
                 FileEditorManager.getInstance(event.getProject()).openFile(childData, true);
             } catch (IOException e) {
                 Notification.showTip("Convert jce/tars to proto", String.format("Create file %s failed. Reason: %s", fileName, e.getMessage()), NotificationType.ERROR);
@@ -199,14 +212,23 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
                     .append(JceUtil.convertToSnakeCase(jceField.getName()))
                     .append(" = ").append(atomicInteger.incrementAndGet())
                     .append(';');
-            if (!jceField.getComment().isEmpty()) {
-                for (String comment : jceField.getComment().split("\n")) {
-                    protoSb.append(" // ").append(comment);
-                }
-            }
+            writeComment(protoSb, jceField.getComment());
             protoSb.append("\n");
         }
         protoSb.append("}").append('\n');
+    }
+
+    private static void writeComment(StringBuilder sb, String comment2) {
+        if (!comment2.isEmpty()) {
+            String[] split = comment2.split("\n");
+            for (int i = 0, splitLength = split.length; i < splitLength; i++) {
+                String comment = split[i];
+                sb.append(" // ").append(comment);
+                if (i != splitLength - 1) {
+                    sb.append('\n').append("   ");
+                }
+            }
+        }
     }
 
     private static void writeEnum(StringBuilder protoSb, JceEnum jceEnum) {
@@ -230,9 +252,7 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
 
     private static void writeEnumMember(StringBuilder protoSb, JceEnumMember jceEnumMember) {
         protoSb.append("    ").append(jceEnumMember.getName().toUpperCase()).append(" = ").append(jceEnumMember.getOrdinal()).append(';');
-        if (!jceEnumMember.getComment().isEmpty()) {
-            protoSb.append(" // ").append(jceEnumMember.getComment());
-        }
+        writeComment(protoSb, jceEnumMember.getComment());
         protoSb.append("\n");
     }
 
