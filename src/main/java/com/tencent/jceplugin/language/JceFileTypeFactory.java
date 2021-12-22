@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 public class JceFileTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(JceFileType.INSTANCE);
+        fileTypeConsumer.consume(JceFileType.INSTANCE, "jce");
         fileTypeConsumer.consume(JceFileType.INSTANCE, "tars");
     }
 }

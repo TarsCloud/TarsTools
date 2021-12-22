@@ -21,16 +21,28 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiReferenceList;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tencent.jceplugin.language.JceUtil;
-import com.tencent.jceplugin.language.psi.*;
+import com.tencent.jceplugin.language.psi.JceFunctionInfo;
+import com.tencent.jceplugin.language.psi.JceInterfaceInfo;
+import com.tencent.jceplugin.language.psi.JceModuleInfo;
+import com.tencent.jceplugin.language.psi.JceNamedElement;
+import com.tencent.jceplugin.language.psi.JceStructType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 标出Java接口
@@ -46,7 +58,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
         if (className == null || className.isEmpty()) {
             return;
         }
-        final PsiElement moduleInfo = PsiTreeUtil.findFirstParent(element, e -> e instanceof JceModuleInfo);
+        final PsiElement moduleInfo = PsiTreeUtil.findFirstParent(element, JceModuleInfo.class::isInstance);
         if (moduleInfo == null || ((JceModuleInfo) moduleInfo).getName() == null) {
             return;
         }
@@ -64,8 +76,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 if (!moduleName.equalsIgnoreCase(packageName)) {
                     continue;
                 }
-                if (javaClass.hasAnnotation("com.qq.cloud.taf.common.annotation.JceStruct")
-                        && className.equals(javaClass.getName())) {
+                if (JceUtil.isJceStructClass(javaClass) && className.equals(javaClass.getName())) {
                     //是结构体
                     NavigationGutterIconBuilder<PsiElement> javaMethodBuilder =
                             NavigationGutterIconBuilder.create(AllIcons.Nodes.Class)
@@ -77,25 +88,16 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             }
         } else {
             JceInterfaceInfo jceInterfaceInfo = (JceInterfaceInfo) element;
-            PsiClass[] shortJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className,
-                    GlobalSearchScope.allScope(element.getProject()));
-            PsiClass[] servantJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className + "Servant",
-                    GlobalSearchScope.allScope(element.getProject()));
-            PsiClass[] prxJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className + "Prx",
-                    GlobalSearchScope.allScope(element.getProject()));
-            PsiClass[] servantImplJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className + "ServantImpl",
-                    GlobalSearchScope.allScope(element.getProject()));
-            PsiClass[] prxImplJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className + "PrxImpl",
-                    GlobalSearchScope.allScope(element.getProject()));
-            PsiClass[] implJavaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className + "Impl",
-                    GlobalSearchScope.allScope(element.getProject()));
-            List<PsiClass> javaClasses = new ArrayList<>();
-            javaClasses.addAll(Arrays.asList(shortJavaClasses));
-            javaClasses.addAll(Arrays.asList(servantJavaClasses));
-            javaClasses.addAll(Arrays.asList(prxJavaClasses));
-            javaClasses.addAll(Arrays.asList(servantImplJavaClasses));
-            javaClasses.addAll(Arrays.asList(prxImplJavaClasses));
-            javaClasses.addAll(Arrays.asList(implJavaClasses));
+            List<PsiClass> javaClasses = Stream.of(className, className + "Servant",
+                            className + "Prx",
+                            className + "ServantImpl",
+                            className + "PrxImpl",
+                            className + "Impl",
+                            className + "ClientApi")
+                    .map(name -> PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(name,
+                            GlobalSearchScope.allScope(element.getProject())))
+                    .flatMap(Stream::of)
+                    .collect(Collectors.toList());
             for (PsiClass javaClass : javaClasses) {
                 String name = javaClass.getQualifiedName();
                 if (name == null) {
@@ -109,7 +111,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         continue;
                     }
                 }
-                boolean isJceClass = javaClass.hasAnnotation("com.qq.cloud.taf.common.annotation.JceService");
+                boolean isJceClass = JceUtil.isJceClass(javaClass);
                 boolean isImplement = !javaClass.isInterface();
                 if (!isJceClass) {
                     //看看实现接口有没有jce注解
@@ -119,7 +121,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         for (PsiJavaCodeReferenceElement referenceElement : implementsList.getReferenceElements()) {
                             PsiElement resolve = referenceElement.resolve();
                             if (resolve instanceof PsiClass && ((PsiClass) resolve).getName() != null) {
-                                isJceClass = ((PsiClass) resolve).hasAnnotation("com.qq.cloud.taf.common.annotation.JceService");
+                                isJceClass = JceUtil.isJceClass((PsiClass) resolve);
                                 if (isJceClass) {
                                     name = ((PsiClass) resolve).getName();
                                     break;
@@ -131,18 +133,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 if (!isJceClass || name == null) {
                     continue;
                 }
-                if (name.endsWith("Impl")) {
-                    name = name.substring(0, name.length() - "Impl".length());
-                }
-                if (name.endsWith("Servant") || name.endsWith("Prx")) {
-                    //是Prx
-                    //查找interface
-                    if (name.endsWith("Servant")) {
-                        name = name.substring(0, name.length() - "Servant".length());
-                    } else {
-                        name = name.substring(0, name.length() - "Prx".length());
-                    }
-                }
+                name = JceUtil.getJceServiceNameFromClassName(name);
                 if (className.equals(name)) {
                     //是接口
                     Icon icon = isImplement ? AllIcons.Nodes.Class : AllIcons.Nodes.Interface;
@@ -154,7 +145,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     //标注方法
                     Icon methodIcon = isImplement ? AllIcons.Gutter.ImplementedMethod : AllIcons.Nodes.Interface;
                     for (PsiMethod javaMethod : javaClass.getMethods()) {
-                        String methodName = getFunctionName(javaMethod);
+                        String methodName = JceUtil.getFunctionName(javaMethod);
                         if (methodName.isEmpty()) {
                             continue;
                         }
@@ -171,15 +162,5 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 }
             }
         }
-    }
-
-    @NotNull
-    private static String getFunctionName(PsiMethod javaMethod) {
-        String methodName;
-        methodName = javaMethod.getName();
-        if (methodName.startsWith("async_")) {
-            methodName = methodName.substring("async_".length());
-        }
-        return methodName;
     }
 }

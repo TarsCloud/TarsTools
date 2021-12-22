@@ -2,7 +2,7 @@
     <id>com.tencent.jceplugin</id>
     <name>JCE Support</name>
     <version>0.3.1</version>
-    <vendor email="harveyxu@tencent.com,kongyuanyuan@yuewen.com" url="http://www.tencent.com">Tencent.</vendor>
+    <vendor email="harveyxu@tencent.com,kongyuanyuan@yuewen.com" url="https://www.tencent.com">Tencent.</vendor>
 
     <description><![CDATA[
       <p>This plugin supports the editing of the Jce/Tars file, providing the following features:</p>

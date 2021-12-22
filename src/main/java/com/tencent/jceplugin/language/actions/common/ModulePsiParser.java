@@ -2,6 +2,7 @@ package com.tencent.jceplugin.language.actions.common;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tencent.jceplugin.language.JceParserDefinition;
 import com.tencent.jceplugin.language.JceUtil;
 import com.tencent.jceplugin.language.actions.common.element.JceBuiltInBaseType;
 import com.tencent.jceplugin.language.actions.common.element.JceEnum;
@@ -265,11 +266,17 @@ public class ModulePsiParser {
         if (jceModule != null && !moduleName.equals(jceModule.getName())) {
             //其他模块的结构体，变成模块名+结构体名
             assert name != null;
-            char[] charArr = name.toCharArray();
-            charArr[0] = Character.toUpperCase(charArr[0]);
-            name = new String(charArr);
+            name = upperFirstLetter(name);
             name = jceModule.getName() + name;
         }
+        return name;
+    }
+
+    @NotNull
+    private static String upperFirstLetter(@NotNull String name) {
+        char[] charArr = name.toCharArray();
+        charArr[0] = Character.toUpperCase(charArr[0]);
+        name = new String(charArr);
         return name;
     }
 
@@ -292,8 +299,17 @@ public class ModulePsiParser {
         } else if (fieldType.getBuiltInTypes() != null) {
             return new JceBuiltInBaseType(fieldType.getBuiltInTypes().getText().toLowerCase());
         } else {
+            if (JceParserDefinition.reservedBuiltinType.contains(fieldType.getText().toLowerCase())) {
+                //不规范的基础类型，被转大写了
+                return new JceBuiltInBaseType(fieldType.getText().toLowerCase());
+            }
             assert fieldType.getReference() != null;
             PsiElement psiElement = fieldType.getReference().resolve();
+            if (psiElement == null) {
+                //说明类名写错了，没有解析到引用
+                String dummyStructName = fieldType.getText().replace("::", "");
+                return new JceStruct(dummyStructName, Collections.emptyList(), "unresolved struct");
+            }
             JceType jceType = psiTypeMap.get(psiElement);
             if (jceType != null) {
                 return jceType;

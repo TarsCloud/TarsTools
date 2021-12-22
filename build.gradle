@@ -24,9 +24,10 @@ intellij {
 }
 
 patchPluginXml {
-    changeNotes """<p>v0.3.3 2021/11/22</p>
+    changeNotes """<p>v0.3.3 2021/12/22</p>
       <ul>
       <li>修复Jce转Proto时可能会出现并发修改异常的问题.</li>
+      <li>重命名include文件名时可能会导致include变空的问题.</li>
       </ul>
       <p>v0.3.2 2021/11/07</p>
       <ul>

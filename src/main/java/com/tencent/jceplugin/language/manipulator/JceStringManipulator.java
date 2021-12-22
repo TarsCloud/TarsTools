@@ -24,9 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class JceStringManipulator extends AbstractElementManipulator<JceIncludeFilename> {
     @Override
     public JceIncludeFilename handleContentChange(@NotNull JceIncludeFilename psi, @NotNull TextRange range, String newContent) {
-        String oldText = psi.getText();
-        String newText = oldText.substring(0, range.getStartOffset()) + newContent + oldText.substring(range.getEndOffset());
-        return psi.setName(newText);
+        return psi.setName(newContent);
     }
 
     @NotNull

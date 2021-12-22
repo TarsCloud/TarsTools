@@ -21,18 +21,36 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tencent.jceplugin.language.psi.*;
+import com.tencent.jceplugin.language.psi.JceConstType;
+import com.tencent.jceplugin.language.psi.JceEnumMember;
+import com.tencent.jceplugin.language.psi.JceEnumType;
+import com.tencent.jceplugin.language.psi.JceFile;
+import com.tencent.jceplugin.language.psi.JceFunctionInfo;
+import com.tencent.jceplugin.language.psi.JceFunctionParam;
+import com.tencent.jceplugin.language.psi.JceIncludeFilename;
+import com.tencent.jceplugin.language.psi.JceIncludeInfo;
+import com.tencent.jceplugin.language.psi.JceInterfaceInfo;
+import com.tencent.jceplugin.language.psi.JceModuleInfo;
+import com.tencent.jceplugin.language.psi.JceStructType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JceUtil {
     @NotNull
@@ -510,23 +528,51 @@ public class JceUtil {
     }
 
     public static String convertToSnakeCase(String name) {
+        if (name.length() <= 1) {
+            return name.toLowerCase();
+        }
+        //USER_ID -> user_id
+        //USER_ID -> user_id
+        //UserName -> user_name
+        //_user_Name -> user_name
+        //_user__Name -> user_name
+        //_user_Name___ -> user_name
+        StringBuilder sb = new StringBuilder(name.length() * 2);
         char[] chars = name.toCharArray();
-        StringBuilder sb = new StringBuilder(name.length());
-        boolean needSlash = false;
-        for (char aChar : chars) {
-            if (!Character.isAlphabetic(aChar) && !Character.isDigit(aChar)) {
-                //如果遇到了非英文字母数字，就意味着在下次输出英文字母之前要先输出一个下划线
+        int i = 0;
+        boolean hasSlash = false;
+        while (i < chars.length) {
+            if (Character.isUpperCase(chars[i])) {
+                //输出一个下划线
+                if (sb.length() > 0 && !hasSlash) {
+                    sb.append('_');
+                }
+                sb.append(Character.toLowerCase(chars[i]));
+                //如果下一个字符也是大写，就需要一同提取出来
+                while (i + 1 < chars.length && Character.isUpperCase(chars[i + 1])) {
+                    sb.append(Character.toLowerCase(chars[i + 1]));
+                    i++;
+                }
+                hasSlash = false;
+            } else if (chars[i] == '_' || chars[i] == ' ') {
+                //遇到了下划线，需要合并多个下划线
                 if (sb.length() > 0) {
-                    //在开头不要输出下划线
-                    needSlash = true;
+                    //丢弃开头的下划线
+                    sb.append('_');
+                }
+                hasSlash = true;
+                while (i + 1 < chars.length && (chars[i + 1] == '_' || chars[i + 1] == ' ')) {
+                    i++;
                 }
             } else {
-                if (needSlash || (Character.isUpperCase(aChar) && sb.length() > 0)) {
-                    sb.append('_');
-                    needSlash = false;
-                }
-                sb.append(Character.toLowerCase(aChar));
+                sb.append(chars[i]);
+                hasSlash = false;
             }
+            i++;
+        }
+        if (sb.charAt(sb.length() - 1) == '_') {
+            //干掉最后的下划线
+            sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     }
@@ -549,5 +595,59 @@ public class JceUtil {
             }
         }
         return sb.toString();
+    }
+
+    public static boolean isJceClass(@NotNull PsiClass javaClass) {
+        return javaClass.hasAnnotation("com.qq.cloud.taf.common.annotation.JceService")
+                || javaClass.hasAnnotation("com.tencent.trpc.core.rpc.anno.TRpcService");
+    }
+
+    @NotNull
+    public static String getFunctionName(@NotNull PsiMethod javaMethod) {
+        String methodName;
+        methodName = javaMethod.getName();
+        if (methodName.startsWith("async_")) {
+            methodName = methodName.substring("async_".length());
+        }
+        if (methodName.startsWith("async")
+                && javaMethod.getReturnType() != null
+                && javaMethod.getReturnType().getCanonicalText().endsWith("CompletionStage")) {
+            methodName = methodName.substring("async".length());
+            methodName = methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+        }
+        return methodName;
+    }
+
+    @NotNull
+    public static String getJceServiceNameFromClassName(@NotNull String name) {
+        if (name.endsWith("Impl")) {
+            name = name.substring(0, name.length() - "Impl".length());
+        }
+        return getJceServiceNameFromInterfaceName(name);
+    }
+
+    @NotNull
+    public static String getJceServiceNameFromInterfaceName(@NotNull String name) {
+        if (isJceServiceInterfaceName(name)) {
+            //是Prx
+            //查找interface
+            if (name.endsWith("Servant")) {
+                name = name.substring(0, name.length() - "Servant".length());
+            } else if (name.endsWith("Prx")) {
+                name = name.substring(0, name.length() - "Prx".length());
+            } else {
+                name = name.substring(0, name.length() - "ClientApi".length());
+            }
+        }
+        return name;
+    }
+
+    public static boolean isJceServiceInterfaceName(@NotNull String name) {
+        return name.endsWith("Servant") || name.endsWith("Prx") || name.endsWith("ClientApi");
+    }
+
+    public static boolean isJceStructClass(@NotNull PsiClass javaClassElement) {
+        return javaClassElement.hasAnnotation("com.qq.cloud.taf.common.annotation.JceStruct")
+                || javaClassElement.hasAnnotation("com.tencent.jce.annotation.JceStruct");
     }
 }
