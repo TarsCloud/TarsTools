@@ -16,7 +16,12 @@
 
 package com.tencent.jceplugin.language.formatter;
 
-import com.intellij.formatting.*;
+import com.intellij.formatting.Block;
+import com.intellij.formatting.CustomFormattingModelBuilder;
+import com.intellij.formatting.FormattingContext;
+import com.intellij.formatting.FormattingModel;
+import com.intellij.formatting.FormattingModelProvider;
+import com.intellij.formatting.SpacingBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
@@ -34,7 +39,9 @@ public class JceFormattingModelBuilder implements CustomFormattingModelBuilder {
 
     @NotNull
     @Override
-    public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
+    public FormattingModel createModel(FormattingContext formattingContext) {
+        var settings = formattingContext.getCodeStyleSettings();
+        var element = formattingContext.getPsiElement();
         JceFormatContext context = new JceFormatContext(settings, createSpaceBuilder(settings));
         Block block = new JceBlock(context, element.getNode());
         return FormattingModelProvider.createFormattingModelForPsiFile(element.getContainingFile(), block, settings);
@@ -65,7 +72,7 @@ public class JceFormattingModelBuilder implements CustomFormattingModelBuilder {
                 .spaceIf(commonSettings.SPACE_BEFORE_SEMICOLON)
                 .after(JceTypes.SEMICOLON)
                 .spaceIf(commonSettings.SPACE_AFTER_SEMICOLON)
-                //所有以;结尾的元素
+                // 所有以;结尾的元素
                 .after(TokenSet.create(JceTypes.FIELD_INFO, JceTypes.FUNCTION_INFO, JceTypes.MODULE_INFO, JceTypes.KEY_INFO,
                         JceTypes.STRUCT_TYPE, JceTypes.ENUM_TYPE, JceTypes.CONST_TYPE, JceTypes.INTERFACE_INFO))
                 .spaceIf(commonSettings.SPACE_AFTER_SEMICOLON)

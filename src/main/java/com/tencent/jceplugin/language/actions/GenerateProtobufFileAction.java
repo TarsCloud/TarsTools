@@ -17,6 +17,7 @@
 package com.tencent.jceplugin.language.actions;
 
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -101,6 +102,11 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
             }
             Notification.showTip("Convert jce/tars to proto", String.format("Create file %s successfully", fileName), NotificationType.INFORMATION);
         });
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private static String generateProto(@NotNull JceModule moduleStructure) {
@@ -203,7 +209,7 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
             }
         }
         protoSb.append("message ").append(jceStruct.getName()).append(" {").append('\n');
-        //字段序号从1开始，初始值0
+        // 字段序号从1开始，初始值0
         AtomicInteger atomicInteger = new AtomicInteger();
         for (JceField jceField : jceStruct.getFieldList()) {
             protoSb.append("    ");
@@ -239,9 +245,9 @@ public class GenerateProtobufFileAction extends AnAction implements DumbAware {
             }
         }
         protoSb.append("enum ").append(jceEnum.getName()).append(" {").append('\n');
-        //枚举序号从0开始
+        // 枚举序号从0开始
         if (jceEnum.getMemberList().stream().mapToInt(JceEnumMember::getOrdinal).noneMatch(ordinal -> ordinal == 0)) {
-            //没有序号为0的枚举，要手动造一个默认的，否则pb会报错
+            // 没有序号为0的枚举，要手动造一个默认的，否则pb会报错
             writeEnumMember(protoSb, new JceEnumMember(JceUtil.convertToSnakeCase(jceEnum.getName()).toUpperCase() + "_UNSPECIFIED", 0, "枚举未定义值"));
         }
         for (JceEnumMember jceEnumMember : jceEnum.getMemberList()) {

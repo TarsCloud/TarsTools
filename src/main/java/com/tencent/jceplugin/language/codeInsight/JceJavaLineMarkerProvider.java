@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -51,10 +51,7 @@ import java.util.Objects;
 public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element,
-                                            @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
-        if (!(element instanceof PsiClass || element instanceof PsiMethodCallExpression || element instanceof PsiField || element instanceof PsiMethod)) {
-            return;
-        }
+                                            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         @Nullable PsiIdentifier identifier;
         @Nullable PsiClass javaClassElement;
         @Nullable String methodName;
@@ -67,9 +64,9 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             List<JceInterfaceInfo> interfaceInfoList = resolveJceInterface(javaClassElement);
             if (!interfaceInfoList.isEmpty()) {
                 for (JceInterfaceInfo jceInterfaceInfo : interfaceInfoList) {
-                    //标注interface实现
+                    // 标注interface实现
                     markInterface(result, identifier, jceInterfaceInfo);
-                    //标注方法定义
+                    // 标注方法定义
                     PsiMethod[] javaMethods = javaClassElement.getMethods();
                     for (PsiMethod javaMethod : javaMethods) {
                         methodName = JceUtil.getFunctionName(javaMethod);
@@ -83,7 +80,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     }
                 }
             } else {
-                //检查是不是jce module下的结构体/枚举
+                // 检查是不是jce module下的结构体/枚举
                 String qualifiedName = javaClassElement.getQualifiedName();
                 if (qualifiedName == null) {
                     return;
@@ -95,22 +92,22 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 List<JceModuleInfo> modules = JceUtil.findModules(element.getProject(), moduleName, true);
                 for (JceModuleInfo module : modules) {
                     if (javaClassElement.isEnum()) {
-                        //enum
+                        // enum
                         List<JceEnumType> enumTypeList = JceUtil.findEnum(module, className);
                         for (JceEnumType jceEnumType : enumTypeList) {
                             if (className.equalsIgnoreCase(jceEnumType.getName())) {
-                                //找到了enum
+                                // 找到了enum
                                 markEnum(result, javaClassElement, jceEnumType);
                             }
                         }
                     } else {
                         if (isStruct) {
-                            //结构体
-                            //struct
+                            // 结构体
+                            // struct
                             List<JceStructType> struct = JceUtil.findStruct(module, className);
                             for (JceStructType jceStructType : struct) {
                                 if (className.equalsIgnoreCase(jceStructType.getName())) {
-                                    //找到了struct
+                                    // 找到了struct
                                     markStruct(result, javaClassElement, jceStructType);
                                 }
                             }
@@ -119,9 +116,8 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 }
             }
 
-        } else if (element instanceof PsiMethodCallExpression) {
-            //调用方法，检查是不是在调用taf服务的方法
-            PsiMethodCallExpression methodCallExpression = (PsiMethodCallExpression) element;
+        } else if (element instanceof PsiMethodCallExpression methodCallExpression) {
+            // 调用方法，检查是不是在调用taf服务的方法
             PsiMethod psiMethod = methodCallExpression.resolveMethod();
             if (psiMethod != null) {
                 if (methodCallExpression.getMethodExpression().getReferenceNameElement() instanceof PsiIdentifier) {
@@ -133,7 +129,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         for (JceInterfaceInfo interfaceInfo : jceInterfaceInfoList) {
                             JceFunctionInfo functionInfo = JceUtil.findFunction(interfaceInfo, methodName);
                             if (functionInfo != null) {
-                                //标注在调用语句的方法名字处
+                                // 标注在调用语句的方法名字处
                                 markFunction(result, identifier, functionInfo);
                             }
                         }
@@ -149,14 +145,13 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 if (javaClassElement != null) {
                     List<JceInterfaceInfo> jceInterfaceInfoList = resolveJceInterface(javaClassElement);
                     for (JceInterfaceInfo interfaceInfo : jceInterfaceInfoList) {
-                        //标注在字段名上
+                        // 标注在字段名上
                         markInterface(result, identifier, interfaceInfo);
                     }
                 }
             }
-        } else {
-            //PsiMethod 方法定义，检查返回值是不是interface
-            PsiMethod psiMethod = (PsiMethod) element;
+        } else if (element instanceof PsiMethod psiMethod) {
+            // PsiMethod 方法定义，检查返回值是不是interface
             PsiIdentifier nameIdentifier = psiMethod.getNameIdentifier();
             if (nameIdentifier == null) {
                 return;
@@ -173,7 +168,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 List<JceInterfaceInfo> interfaceInfoList = resolveJceInterface(javaClass);
                 if (!interfaceInfoList.isEmpty()) {
                     for (JceInterfaceInfo jceInterfaceInfo : interfaceInfoList) {
-                        //标注interface实现
+                        // 标注interface实现
                         markInterface(result, nameIdentifier, jceInterfaceInfo);
                     }
                 }
@@ -185,7 +180,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
         NavigationGutterIconBuilder<PsiElement> javaMethodBuilder =
                 NavigationGutterIconBuilder.create(JceIcons.FILE)
                         .setTargets(jceStructType.getIdentifier())
-                        .setTooltipText("Navigate to Jce Struct Declaration");
+                        .setTooltipText("Navigate to jce struct declaration");
         result.add(javaMethodBuilder.createLineMarkerInfo(Objects.requireNonNull(javaClassElement.getNameIdentifier())));
     }
 
@@ -193,7 +188,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
         NavigationGutterIconBuilder<PsiElement> javaEnumBuilder =
                 NavigationGutterIconBuilder.create(JceIcons.FILE)
                         .setTargets(jceEnumType.getIdentifier())
-                        .setTooltipText("Navigate to Jce Enum Declaration");
+                        .setTooltipText("Navigate to jce enum declaration");
         result.add(javaEnumBuilder.createLineMarkerInfo(Objects.requireNonNull(javaClassElement.getNameIdentifier())));
     }
 
@@ -201,7 +196,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
         NavigationGutterIconBuilder<PsiElement> javaMethodBuilder =
                 NavigationGutterIconBuilder.create(JceIcons.FILE)
                         .setTargets(jceFunction.getNameIdentifier())
-                        .setTooltipText("Navigate to Jce Function Declaration");
+                        .setTooltipText("Navigate to jce function declaration");
         result.add(javaMethodBuilder.createLineMarkerInfo(Objects.requireNonNull(nameIdentifier)));
     }
 
@@ -209,7 +204,7 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
         NavigationGutterIconBuilder<PsiElement> javaClassBuilder =
                 NavigationGutterIconBuilder.create(JceIcons.FILE)
                         .setTargets(jceInterfaceInfo.getNameIdentifier())
-                        .setTooltipText("Navigate to Jce Interface Declaration");
+                        .setTooltipText("Navigate to jce interface declaration");
         result.add(javaClassBuilder.createLineMarkerInfo(identifier));
     }
 
@@ -218,8 +213,8 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
         String name = javaClass.getName();
         if (!isJceClass) {
             PsiReferenceList implementsList = javaClass.getImplementsList();
-            if (implementsList != null && implementsList.getReferenceElements().length > 0) {
-                //看看是不是实现类
+            if (implementsList != null) {
+                // 看看是不是实现类
                 for (PsiJavaCodeReferenceElement referenceElement : implementsList.getReferenceElements()) {
                     PsiElement resolve = referenceElement.resolve();
                     if (resolve instanceof PsiClass) {
@@ -240,8 +235,8 @@ public class JceJavaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             PsiIdentifier nameIdentifier = javaClass.getNameIdentifier();
             if (nameIdentifier != null && name != null
                     && (JceUtil.isJceServiceInterfaceName(name))) {
-                //是Prx
-                //查找interface
+                // 是Prx
+                // 查找interface
                 String interfaceName = JceUtil.getJceServiceNameFromInterfaceName(name);
                 return JceUtil.findInterface(javaClass.getProject(), interfaceName);
             }

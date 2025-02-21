@@ -1,34 +1,17 @@
-<idea-plugin>
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin require-restart="false">
     <id>com.tencent.jceplugin</id>
     <name>JCE Support</name>
-    <version>0.3.1</version>
     <vendor email="harveyxu@tencent.com,kongyuanyuan@yuewen.com" url="https://www.tencent.com">Tencent.</vendor>
 
-    <description><![CDATA[
-      <p>This plugin supports the editing of the Jce/Tars file, providing the following features:</p>
-      <ol>
-            <li>Syntax highlighting</li>
-            <li>Code commenting</li>
-            <li>Formatting</li>
-            <li>Auto Completion</li>
-            <li>Static Analysis</li>
-            <li>......</li>
-      </ol>
-      <p>If any question, contact with harveyxu @ wechat work or <a href="mailto:kongyuanyuan@yuewen.com">kongyuanyuan@yuewen.com</a></p>
-    ]]>
-    </description>
-
-    <idea-version since-build="191"/>
-
-    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-         on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-    <depends optional="true" config-file="java-plugin.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="com.tencent.jceplugin-withJava.xml">com.intellij.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.tencent.jceplugin.language.JceFileTypeFactory"/>
+        <fileType name="Jce File" language="Jce" implementationClass="com.tencent.jceplugin.language.JceFileType"
+                  extensions="jce;tars"/>
         <lang.parserDefinition language="Jce"
                                implementationClass="com.tencent.jceplugin.language.JceParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Jce"
@@ -55,16 +38,16 @@
                                 implementationClass="com.tencent.jceplugin.language.completion.JceCompletionContributor"/>
         <completion.contributor language="Jce"
                                 implementationClass="com.tencent.jceplugin.language.completion.JceCustomTypeCompletionContributor"/>
-        <psi.referenceContributor
-                implementation="com.tencent.jceplugin.language.reference.JceTypeReferenceContributor"/>
-        <psi.referenceContributor
-                implementation="com.tencent.jceplugin.language.reference.JceFileReferenceContributor"/>
-        <psi.referenceContributor
-                implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructReferenceContributor"/>
-        <psi.referenceContributor
-                implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructFieldReferenceContributor"/>
-        <psi.referenceContributor
-                implementation="com.tencent.jceplugin.language.reference.JceFieldDefaultAssignmentReferenceContributor"/>
+        <psi.referenceContributor language="Jce"
+                                  implementation="com.tencent.jceplugin.language.reference.JceTypeReferenceContributor"/>
+        <psi.referenceContributor language="Jce"
+                                  implementation="com.tencent.jceplugin.language.reference.JceFileReferenceContributor"/>
+        <psi.referenceContributor language="Jce"
+                                  implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructReferenceContributor"/>
+        <psi.referenceContributor language="Jce"
+                                  implementation="com.tencent.jceplugin.language.reference.JceKeyInfoStructFieldReferenceContributor"/>
+        <psi.referenceContributor language="Jce"
+                                  implementation="com.tencent.jceplugin.language.reference.JceFieldDefaultAssignmentReferenceContributor"/>
         <lang.commenter language="Jce" implementationClass="com.tencent.jceplugin.language.JceCommenter"/>
         <lang.findUsagesProvider language="Jce"
                                  implementationClass="com.tencent.jceplugin.language.JceFindUsagesProvider"/>
@@ -121,6 +104,7 @@
                 implementation="com.tencent.jceplugin.language.codeStyle.JceCodeStyleSettingsProvider"/>
         <langCodeStyleSettingsProvider
                 implementation="com.tencent.jceplugin.language.codeStyle.JceLanguageCodeStyleSettingsProvider"/>
+        <notificationGroup displayType="BALLOON" id="Tencent Jce Support"/>
     </extensions>
 
     <actions>

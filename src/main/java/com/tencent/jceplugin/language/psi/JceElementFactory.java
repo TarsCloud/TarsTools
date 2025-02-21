@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -56,15 +56,15 @@ public class JceElementFactory {
                     Optional.ofNullable(oldElement.getFieldType()).map(PsiElement::getText).orElse("int"),
                     newName));
             if (oldElement.getFieldDefaultAssignment() != null) {
-                //有默认值
+                // 有默认值
                 fileContentBuilder.append("=").append(oldElement.getFieldDefaultAssignment().getText());
             }
-            //field end
+            // field end
             fileContentBuilder.append(";");
         }
-        //struct end
+        // struct end
         fileContentBuilder.append("};");
-        //module end
+        // module end
         fileContentBuilder.append("};");
         return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()).findChildByClass(JceModuleInfo.class), JceFieldInfo.class);
     }
@@ -80,14 +80,14 @@ public class JceElementFactory {
                 fieldType,
                 fieldName));
         if (defaultValue != null && !defaultValue.isEmpty()) {
-            //有默认值
+            // 有默认值
             fileContentBuilder.append("=").append(defaultValue);
         }
-        //field end
+        // field end
         fileContentBuilder.append(";");
-        //struct end
+        // struct end
         fileContentBuilder.append("};");
-        //module end
+        // module end
         fileContentBuilder.append("};");
         return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()).findChildByClass(JceModuleInfo.class), JceFieldInfo.class);
     }
@@ -99,19 +99,19 @@ public class JceElementFactory {
         if (oldElement != null) {
             // aaa=1, bbb=2, ccc, ddd
             oldElement.getEnumMemberList().forEach(enumMember -> {
-                //aaa=1
+                // aaa=1
                 fileContentBuilder.append(enumMember.getIdentifier().getText());
                 if (enumMember.getNumInt() != null) {
-                    //默认值
+                    // 默认值
                     fileContentBuilder.append("=").append(enumMember.getNumInt().getText());
                 }
-                //enum member end
+                // enum member end
                 fileContentBuilder.append(",");
             });
         }
-        //enum end
+        // enum end
         fileContentBuilder.append("};");
-        //module end
+        // module end
         fileContentBuilder.append("};");
 
         return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceEnumType.class);
@@ -122,47 +122,46 @@ public class JceElementFactory {
         fileContentBuilder.append("module dummy {");
         fileContentBuilder.append("enum dummyEnum {");
         if (oldElement != null) {
-            //aaa=1
+            // aaa=1
             fileContentBuilder.append(newName);
             if (oldElement.getNumInt() != null) {
-                //默认值
+                // 默认值
                 fileContentBuilder.append("=").append(oldElement.getNumInt().getText());
             }
-            //enum member end
+            // enum member end
             fileContentBuilder.append(",");
         }
-        //enum end
+        // enum end
         fileContentBuilder.append("};");
-        //module end
+        // module end
         fileContentBuilder.append("};");
 
         return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceEnumMember.class);
     }
 
     public static JceConstType createConst(Project project, @Nullable JceConstType oldElement, String newName) {
-        StringBuilder fileContentBuilder = new StringBuilder();
-        fileContentBuilder.append("module dummy {");
-        fileContentBuilder.append("const ");
-        fileContentBuilder.append(Optional.ofNullable(oldElement)
-                .map(JceConstType::getBuiltInTypes)
-                .map(PsiElement::getText)
-                .orElse("int"));
-        fileContentBuilder.append(" ");
-        fileContentBuilder.append(newName);
-        fileContentBuilder.append(";");
-        //module end
-        fileContentBuilder.append("};");
+        var fileContentBuilder = "module dummy {" +
+                "const " +
+                Optional.ofNullable(oldElement)
+                        .map(JceConstType::getBuiltInTypes)
+                        .map(PsiElement::getText)
+                        .orElse("int") +
+                " " +
+                newName +
+                ";" +
+                // module end
+                "};";
 
-        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceConstType.class);
+        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder), JceConstType.class);
     }
 
     public static JceFunctionInfo createFunction(Project project, @Nullable JceFunctionInfo oldElement, String newName) {
         StringBuilder fileContentBuilder = new StringBuilder();
         fileContentBuilder.append("module dummy {");
         fileContentBuilder.append("interface dummyInterface {");
-        //int funcName(int a, int b, out int c);
+        // int funcName(int a, int b, out int c);
         fileContentBuilder.append(String.format("%s %s(",
-                //返回值类型
+                // 返回值类型
                 Optional.ofNullable(oldElement)
                         .map(JceFunctionInfo::getReturnType)
                         .map(PsiElement::getText)
@@ -170,18 +169,18 @@ public class JceElementFactory {
                         .orElse("void"),
                 newName
         ));
-        //参数列表
+        // 参数列表
         if (oldElement != null) {
             JceFunctionParamList functionParamList = oldElement.getFunctionParamList();
             if (functionParamList != null) {
                 fileContentBuilder.append(functionParamList.getText());
             }
         }
-        //function end
+        // function end
         fileContentBuilder.append(");");
-        //interface end
+        // interface end
         fileContentBuilder.append("};");
-        //module end
+        // module end
         fileContentBuilder.append("};");
         return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceFunctionInfo.class);
     }
@@ -193,24 +192,23 @@ public class JceElementFactory {
     }
 
     public static JceFunctionParam createFunctionParam(Project project, JceFunctionParam oldElement, String newName) {
-        StringBuilder fileContentBuilder = new StringBuilder();
-        fileContentBuilder.append("module dummy {");
-        fileContentBuilder.append("interface dummyInterface {");
-        //int funcName(int a, int b, out int c);
-        fileContentBuilder.append("void dummyFunction(");
-        //参数列表
-        fileContentBuilder.append(String.format("%s %s %s",
-                oldElement.getFieldTypeModifier() != null ? "out" : "",
-                oldElement.getFieldType().getText(),
-                newName
-        ));
-        //function end
-        fileContentBuilder.append(");");
-        //interface end
-        fileContentBuilder.append("};");
-        //module end
-        fileContentBuilder.append("};");
-        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceFunctionParam.class);
+        var fileContentBuilder = "module dummy {" +
+                "interface dummyInterface {" +
+                // int funcName(int a, int b, out int c);
+                "void dummyFunction(" +
+                // 参数列表
+                String.format("%s %s %s",
+                        oldElement.getFieldTypeModifier() != null ? "out" : "",
+                        oldElement.getFieldType().getText(),
+                        newName
+                ) +
+                // function end
+                ");" +
+                // interface end
+                "};" +
+                // module end
+                "};";
+        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder), JceFunctionParam.class);
     }
 
     @NotNull
@@ -220,12 +218,11 @@ public class JceElementFactory {
     }
 
     public static JceKeyInfo createKeyInfoByString(Project project, String keyInfoCode) {
-        StringBuilder fileContentBuilder = new StringBuilder();
-        fileContentBuilder.append("module dummy {");
-        //key [structName, field];
-        fileContentBuilder.append(keyInfoCode);
-        //module end
-        fileContentBuilder.append("};");
-        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder.toString()), JceKeyInfo.class);
+        var fileContentBuilder = "module dummy {" +
+                // key [structName, field];
+                keyInfoCode +
+                // module end
+                "};";
+        return PsiTreeUtil.findChildOfType(createFile(project, fileContentBuilder), JceKeyInfo.class);
     }
 }

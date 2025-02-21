@@ -110,7 +110,7 @@ public class JceSmartEnterProcessor extends SmartEnterProcessorWithFixers {
         }
     }
 
-    private static class JceEnterProcessor extends SmartEnterProcessorWithFixers.FixEnterProcessor {
+    private static class JceEnterProcessor extends FixEnterProcessor {
         @Override
         public boolean doEnter(PsiElement atCaret, PsiFile file, @NotNull Editor editor, boolean modified) {
             plainEnter(editor);

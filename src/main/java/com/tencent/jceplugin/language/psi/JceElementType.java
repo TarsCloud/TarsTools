@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -16,7 +16,11 @@
 
 package com.tencent.jceplugin.language.psi;
 
-import com.intellij.lang.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.Language;
+import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.PsiBuilderFactory;
+import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -66,21 +70,22 @@ public class JceElementType extends IElementType {
                 }
 
                 @Override
-                public boolean isParsable(
-                        final CharSequence buffer, Language fileLanguage, final Project project) {
-                    if (!StringUtil.startsWith(buffer, "/**") ||
-                            !StringUtil.endsWith(buffer, "*/")) return false;
+                public boolean isReparseable(@NotNull ASTNode currentNode,
+                                             @NotNull CharSequence newText,
+                                             @NotNull Language fileLanguage,
+                                             @NotNull Project project) {
+                    if (!StringUtil.startsWith(newText, "/**") || !StringUtil.endsWith(newText, "*/")) {
+                        return false;
+                    }
 
                     // Prevent the parser from consuming non- doc comment tokens.
                     Lexer lexer = JceDocParserDefinition.INSTANCE.createLexer(project);
-                    lexer.start(buffer);
-                    if (lexer.getTokenType() == DOC_COMMENT) {
-                        lexer.advance();
-                        if (lexer.getTokenType() == null) {
-                            return true;
-                        }
+                    lexer.start(newText);
+                    if (lexer.getTokenType() != DOC_COMMENT) {
+                        return false;
                     }
-                    return false;
+                    lexer.advance();
+                    return lexer.getTokenType() == null;
                 }
             };
 }

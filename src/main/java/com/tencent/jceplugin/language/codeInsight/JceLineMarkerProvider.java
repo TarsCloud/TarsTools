@@ -1,13 +1,13 @@
 /**
  * Tencent is pleased to support the open source community by making Tars available.
- *
+ * <p>
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
- *
+ * <p>
  * Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
+ * <p>
  * https://opensource.org/licenses/BSD-3-Clause
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed
  * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -41,7 +41,6 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -50,7 +49,7 @@ import java.util.stream.Stream;
 public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element,
-                                            @NotNull Collection<? super RelatedItemLineMarkerInfo> result) {
+                                            @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         if (!(element instanceof JceStructType || element instanceof JceInterfaceInfo)) {
             return;
         }
@@ -63,9 +62,8 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
             return;
         }
         @NotNull String moduleName = Objects.requireNonNull(((JceModuleInfo) moduleInfo).getName());
-        if (element instanceof JceStructType) {
-            //结构体，找出标记了@struct的java类
-            JceStructType jceStructType = (JceStructType) element;
+        if (element instanceof JceStructType jceStructType) {
+            // 结构体，找出标记了@struct的java类
             PsiClass[] javaClasses = PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(className,
                     GlobalSearchScope.allScope(element.getProject()));
             for (PsiClass javaClass : javaClasses) {
@@ -77,11 +75,11 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     continue;
                 }
                 if (JceUtil.isJceStructClass(javaClass) && className.equals(javaClass.getName())) {
-                    //是结构体
+                    // 是结构体
                     NavigationGutterIconBuilder<PsiElement> javaMethodBuilder =
                             NavigationGutterIconBuilder.create(AllIcons.Nodes.Class)
                                     .setTargets(javaClass.getNameIdentifier())
-                                    .setTooltipText("Navigate to Java Class Declaration");
+                                    .setTooltipText("Navigate to java class declaration");
 
                     result.add(javaMethodBuilder.createLineMarkerInfo(Objects.requireNonNull(jceStructType.getNameIdentifier())));
                 }
@@ -97,7 +95,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     .map(name -> PsiShortNamesCache.getInstance(element.getProject()).getClassesByName(name,
                             GlobalSearchScope.allScope(element.getProject())))
                     .flatMap(Stream::of)
-                    .collect(Collectors.toList());
+                    .toList();
             for (PsiClass javaClass : javaClasses) {
                 String name = javaClass.getQualifiedName();
                 if (name == null) {
@@ -105,7 +103,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 }
                 name = StringUtil.getShortName(name);
                 if (javaClass.isInterface() || javaClass.isEnum()) {
-                    //对于接口和枚举，要区分module，实现类就不需要
+                    // 对于接口和枚举，要区分module，实现类就不需要
                     final String packageName = StringUtil.getShortName(StringUtil.getPackageName(javaClass.getQualifiedName()));
                     if (!moduleName.equalsIgnoreCase(packageName)) {
                         continue;
@@ -114,10 +112,10 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 boolean isJceClass = JceUtil.isJceClass(javaClass);
                 boolean isImplement = !javaClass.isInterface();
                 if (!isJceClass) {
-                    //看看实现接口有没有jce注解
+                    // 看看实现接口有没有jce注解
                     PsiReferenceList implementsList = javaClass.getImplementsList();
-                    if (implementsList != null && implementsList.getReferenceElements().length > 0) {
-                        //看看是不是实现类
+                    if (implementsList != null) {
+                        // 看看是不是实现类
                         for (PsiJavaCodeReferenceElement referenceElement : implementsList.getReferenceElements()) {
                             PsiElement resolve = referenceElement.resolve();
                             if (resolve instanceof PsiClass && ((PsiClass) resolve).getName() != null) {
@@ -135,14 +133,14 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 }
                 name = JceUtil.getJceServiceNameFromClassName(name);
                 if (className.equals(name)) {
-                    //是接口
+                    // 是接口
                     Icon icon = isImplement ? AllIcons.Nodes.Class : AllIcons.Nodes.Interface;
                     NavigationGutterIconBuilder<PsiElement> javaClassBuilder =
                             NavigationGutterIconBuilder.create(icon)
                                     .setTargets(javaClass.getNameIdentifier())
                                     .setTooltipText("Navigate to Java " + (isImplement ? "implement class" : "interface") + " declaration");
                     result.add(javaClassBuilder.createLineMarkerInfo(Objects.requireNonNull(jceInterfaceInfo.getNameIdentifier())));
-                    //标注方法
+                    // 标注方法
                     Icon methodIcon = isImplement ? AllIcons.Gutter.ImplementedMethod : AllIcons.Nodes.Interface;
                     for (PsiMethod javaMethod : javaClass.getMethods()) {
                         String methodName = JceUtil.getFunctionName(javaMethod);
@@ -151,7 +149,7 @@ public class JceLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         }
                         JceFunctionInfo jceFunctionInfo = JceUtil.findFunction(jceInterfaceInfo, methodName);
                         if (jceFunctionInfo != null) {
-                            //找到了method
+                            // 找到了method
                             NavigationGutterIconBuilder<PsiElement> javaMethodBuilder =
                                     NavigationGutterIconBuilder.create(methodIcon)
                                             .setTargets(javaMethod.getNameIdentifier())
