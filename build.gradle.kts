@@ -24,6 +24,11 @@ kotlin {
     jvmToolchain(17)
 }
 
+// Configure Java compilation encoding
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
 // Configure project's dependencies
 repositories {
     mavenCentral()

@@ -36,6 +36,13 @@ import java.lang.reflect.Method;
 public class JceFieldDefaultValueAnnotator implements Annotator {
     private static <T extends Number> T getValue(String text, int radix, long max, Class<T> clazz) {
         try {
+            // Double 和 Float 的 valueOf 方法只接受一个 String 参数，不支持 radix
+            if (clazz == Double.class || clazz == Float.class) {
+                Method method = clazz.getMethod("valueOf", String.class);
+                @SuppressWarnings("unchecked")
+                T value = (T) method.invoke(null, text);
+                return value;
+            }
             Method method = clazz.getMethod("valueOf", String.class, int.class);
             @SuppressWarnings("unchecked")
             T value = (T) method.invoke(null, text, radix);
