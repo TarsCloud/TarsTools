@@ -1,0 +1,7 @@
+<!-- Proxy: 代理同步方法，橙色圆形 + P -->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="8" cy="8" r="7" fill="#EDA200" fill-opacity=".6"/>
+    <path fill="#231F20" fill-opacity=".7" d="M6,5 L6,11 L7,11 L7,8.5 L8.5,8.5 C10,8.5 11,7.5 11,6.75 C11,6 10,5 8.5,5 L6,5 Z M7,6 L8.5,6 C9.5,6 10,6.5 10,6.75 C10,7 9.5,7.5 8.5,7.5 L7,7.5 L7,6 Z"/>
+  </g>
+</svg>

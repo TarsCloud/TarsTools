@@ -1,0 +1,7 @@
+<!-- Callback: 回调方法，青色圆形 + C -->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="8" cy="8" r="7" fill="#3BBBB0" fill-opacity=".6"/>
+    <path fill="#231F20" fill-opacity=".7" d="M10.5,6 C10.5,4.5 9.5,4 8,4 C6.5,4 5.5,5 5.5,6.5 L5.5,9.5 C5.5,11 6.5,12 8,12 C9.5,12 10.5,11.5 10.5,10 L9.5,10 C9.5,11 9,11 8,11 C7,11 6.5,10.5 6.5,9.5 L6.5,6.5 C6.5,5.5 7,5 8,5 C9,5 9.5,5.5 9.5,6 L10.5,6 Z"/>
+  </g>
+</svg>

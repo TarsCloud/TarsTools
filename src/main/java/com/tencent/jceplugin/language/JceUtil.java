@@ -599,16 +599,27 @@ public class JceUtil {
 
     public static boolean isJceClass(@NotNull PsiClass javaClass) {
         return javaClass.hasAnnotation("com.qq.cloud.taf.common.annotation.JceService")
-                || javaClass.hasAnnotation("com.tencent.trpc.core.rpc.anno.TRpcService");
+                || javaClass.hasAnnotation("com.tencent.trpc.core.rpc.anno.TRpcService")
+                // 原始 TarsJava 注解支持
+                || javaClass.hasAnnotation("com.qq.tars.protocol.annotation.Servant")
+                || javaClass.hasAnnotation("com.qq.tars.spring.annotation.TarsServant")
+                // tafjava2 项目注解支持
+                || javaClass.hasAnnotation("com.taf.spring.annotation.TafServant")
+                || javaClass.hasAnnotation("com.taf.protocol.annotation.Servant");
     }
 
     @NotNull
     public static String getFunctionName(@NotNull PsiMethod javaMethod) {
-        String methodName;
-        methodName = javaMethod.getName();
+        String methodName = javaMethod.getName();
+        // tafjava2 生成的方法前缀: async_, promise_, callback_
         if (methodName.startsWith("async_")) {
             methodName = methodName.substring("async_".length());
+        } else if (methodName.startsWith("promise_")) {
+            methodName = methodName.substring("promise_".length());
+        } else if (methodName.startsWith("callback_")) {
+            methodName = methodName.substring("callback_".length());
         }
+        // 原 tarsjava 的 asyncXxx 风格（返回 CompletionStage）
         if (methodName.startsWith("async")
                 && javaMethod.getReturnType() != null
                 && javaMethod.getReturnType().getCanonicalText().endsWith("CompletionStage")) {
@@ -633,9 +644,12 @@ public class JceUtil {
             //查找interface
             if (name.endsWith("Servant")) {
                 name = name.substring(0, name.length() - "Servant".length());
+            } else if (name.endsWith("PrxCallback")) {
+                // tafjava2 生成的回调类
+                name = name.substring(0, name.length() - "PrxCallback".length());
             } else if (name.endsWith("Prx")) {
                 name = name.substring(0, name.length() - "Prx".length());
-            } else {
+            } else if (name.endsWith("ClientApi")) {
                 name = name.substring(0, name.length() - "ClientApi".length());
             }
         }
@@ -643,11 +657,35 @@ public class JceUtil {
     }
 
     public static boolean isJceServiceInterfaceName(@NotNull String name) {
-        return name.endsWith("Servant") || name.endsWith("Prx") || name.endsWith("ClientApi");
+        return name.endsWith("Servant") || name.endsWith("Prx") || name.endsWith("ClientApi") || name.endsWith("PrxCallback");
     }
 
     public static boolean isJceStructClass(@NotNull PsiClass javaClassElement) {
         return javaClassElement.hasAnnotation("com.qq.cloud.taf.common.annotation.JceStruct")
-                || javaClassElement.hasAnnotation("com.tencent.jce.annotation.JceStruct");
+                || javaClassElement.hasAnnotation("com.tencent.jce.annotation.JceStruct")
+                // 原始 TarsJava 注解支持
+                || javaClassElement.hasAnnotation("com.qq.tars.protocol.tars.annotation.TarsStruct")
+                // tafjava2 项目注解支持
+                || javaClassElement.hasAnnotation("com.taf.protocol.taf.annotation.TafStruct");
+    }
+
+    /**
+     * 检查 Java 字段是否是 JCE 结构体属性字段
+     * <p>
+     * 支持以下注解：
+     * <ul>
+     *   <li>com.qq.cloud.taf.common.annotation.JceProperty - 原始 TarsTools</li>
+     *   <li>com.tencent.jce.annotation.JceProperty - 原始 TarsTools</li>
+     *   <li>com.qq.tars.protocol.tars.annotation.TarsStructProperty - TarsJava</li>
+     *   <li>com.taf.protocol.taf.annotation.TafStructProperty - tafjava2</li>
+     * </ul>
+     */
+    public static boolean isJceStructField(@NotNull com.intellij.psi.PsiField javaField) {
+        return javaField.hasAnnotation("com.qq.cloud.taf.common.annotation.JceProperty")
+                || javaField.hasAnnotation("com.tencent.jce.annotation.JceProperty")
+                // 原始 TarsJava 注解支持
+                || javaField.hasAnnotation("com.qq.tars.protocol.tars.annotation.TarsStructProperty")
+                // tafjava2 项目注解支持
+                || javaField.hasAnnotation("com.taf.protocol.taf.annotation.TafStructProperty");
     }
 }
