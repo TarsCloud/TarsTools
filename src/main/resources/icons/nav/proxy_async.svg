@@ -1,0 +1,7 @@
+<!-- Proxy-Async: 异步方法，紫色圆形 + A -->
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g fill="none" fill-rule="evenodd">
+    <circle cx="8" cy="8" r="7" fill="#9876AA" fill-opacity=".6"/>
+    <path fill="#231F20" fill-opacity=".7" d="M8,4 L5,11 L6.2,11 L6.8,9.5 L9.2,9.5 L9.8,11 L11,11 L8,4 Z M7.2,8.5 L8,6 L8.8,8.5 L7.2,8.5 Z"/>
+  </g>
+</svg>
