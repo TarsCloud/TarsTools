@@ -6,6 +6,20 @@
 
 ## [Unreleased]
 
+## [0.3.5] - 2025-12-09
+
+### Added
+
+- Support navigation to callback/proxy/promise/impl Java class from JCE/TARS file.
+
+### Fixed
+
+- Wrongly show error for default value `0.0` for double field.
+
+### Thanks
+
+- 感谢[xiaohaiGit](https://github.com/xiaohaiGit)
+
 ## [0.3.4] - 2025-02-22
 
 ### Added

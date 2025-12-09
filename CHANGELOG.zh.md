@@ -6,6 +6,20 @@
 
 ## [Unreleased]
 
+## [0.3.5] - 2025-12-09
+
+### Added
+
+- 支持从jce/tars文件跳转到 callback/proxy/promise/impl Java class。
+
+### Fixed
+
+- 当double字段默认值为`0.0`时错误提示的问题。
+
+### Thanks
+
+- 感谢[xiaohaiGit](https://github.com/xiaohaiGit)
+
 ## [0.3.4] - 2025-02-22
 
 ### Added
