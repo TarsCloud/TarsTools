@@ -674,6 +674,7 @@ public class JceUtil {
      * <p>
      * 支持以下注解：
      * <ul>
+     *   <li>com.qq.cloud.taf.common.annotation.JceStructProperty - 闭源的taf</li>
      *   <li>com.qq.cloud.taf.common.annotation.JceProperty - 原始 TarsTools</li>
      *   <li>com.tencent.jce.annotation.JceProperty - 原始 TarsTools</li>
      *   <li>com.qq.tars.protocol.tars.annotation.TarsStructProperty - TarsJava</li>
@@ -681,7 +682,8 @@ public class JceUtil {
      * </ul>
      */
     public static boolean isJceStructField(@NotNull com.intellij.psi.PsiField javaField) {
-        return javaField.hasAnnotation("com.qq.cloud.taf.common.annotation.JceProperty")
+        return javaField.hasAnnotation("com.qq.cloud.taf.common.annotation.JceStructProperty")
+                || javaField.hasAnnotation("com.qq.cloud.taf.common.annotation.JceProperty")
                 || javaField.hasAnnotation("com.tencent.jce.annotation.JceProperty")
                 // 原始 TarsJava 注解支持
                 || javaField.hasAnnotation("com.qq.tars.protocol.tars.annotation.TarsStructProperty")
